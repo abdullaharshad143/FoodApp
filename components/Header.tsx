@@ -25,6 +25,8 @@ const Header = () => {
 const styles = StyleSheet.create({
     mainContainer: {
         justifyContent: 'center',
+        position:'absolute',
+        top:10
     },
     backButton: {
         width: horizontalScale(45),

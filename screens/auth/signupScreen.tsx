@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
 import Button from "../../components/Button";
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import Fonts from "../../theme/typographic";
 
 const SignupScreen = ({
     navigation,
@@ -14,11 +15,11 @@ const SignupScreen = ({
     const [passwordVisibility, setPasswordVisibility] = useState(true);
     const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(true);
     const handlePress = useCallback(() => {
-
+        navigation.navigate('AddressInfoScreen')
     }, [])
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.headerContainer}>
+            <View>
              <Header/>
             </View>
             <View style={styles.contentContainer}>
@@ -90,19 +91,16 @@ const SignupScreen = ({
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        justifyContent: 'center',
-    },
-    headerContainer:{
-        flex:0.2,
+        justifyContent: 'space-around',
     },
     contentContainer: {
         alignItems: 'center',
-        flex:0.7
+        flex:0.75,
     },
     headingStyle: {
         fontSize: moderateScale(30),
         color: Colors.slateGrey,
-        fontWeight: 'bold'
+        fontFamily: Fonts.Family.Bold
     },
     inputContainer: {
         width: '73%',
@@ -117,7 +115,8 @@ const styles = StyleSheet.create({
         marginHorizontal: horizontalScale(5),
         paddingVertical: verticalScale(7),
         paddingHorizontal: horizontalScale(5),
-        flex:1
+        flex:1,
+        fontFamily:Fonts.Family.SemiBold,
     },
     eyeIcon:{
         marginHorizontal:horizontalScale(10),

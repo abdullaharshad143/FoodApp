@@ -1,6 +1,7 @@
 import React from "react";
 import {Text, TouchableOpacity, StyleSheet} from 'react-native'
 import { verticalScale } from "../utils/responsive";
+import Fonts from "../theme/typographic";
 
 
 interface ButtonProps {
@@ -28,7 +29,8 @@ const styles = StyleSheet.create({
 
     },
     textStyle:{
-        textAlign:'center'
+        textAlign:'center',
+        fontFamily: Fonts.Family.Bold
     }
 })
 

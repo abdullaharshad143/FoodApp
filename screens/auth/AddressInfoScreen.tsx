@@ -9,61 +9,62 @@ import Button from "../../components/Button";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import Fonts from "../../theme/typographic";
 
-
-const LoginScreen = ({
+const AddressInfoScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
     const [passwordVisibility, setPasswordVisibility] = useState(true);
+    const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(true);
     const handlePress = useCallback(() => {
 
     }, [])
-    const handleCreateAccount = useCallback(() => {
-        navigation.navigate("SignupScreen");
-    }, [])
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.contentContainer}>
-                <Text style={styles.headingStyle}>Login</Text>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.inputStyle}
-                        placeholder="Email"
-                    >
-                    </TextInput>
-                </View>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.inputStyle}
-                        placeholder="Password"
-                        secureTextEntry={passwordVisibility}
-                    >
-                    </TextInput>
-                    {passwordVisibility ?
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye-slash" size={20} color={"black"}
-                        onPress={()=>setPasswordVisibility(false)}
-                        />
-                        :
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye" size={20} color={"black"}
-                        onPress={()=>setPasswordVisibility(true)}
-                        />
-                        }
-                </View>
-                <Button title="Sign in" onPress={handlePress}>
-                </Button>
-                <Button title="Create Account" onPress={handleCreateAccount}>
-                </Button>
-                <TouchableOpacity onPress={()=>{navigation.navigate('ForgotPasswordScreen')}}>
-                <Text style={styles.forgotPasswordText}>{'Forgot Password?'}</Text>
-                </TouchableOpacity>
+            <View style={styles.headerContainer}>
+             <Header/>
             </View>
-            <View style={styles.termsContainer}>
-                <Text style={styles.termsText}>{'You are agreeing to our '}
-                    <Text style={styles.underlineText}>terms and conditions</Text>
-                </Text>
+            <View style={styles.contentContainer}>
+                <Text style={styles.headingStyle}>{'Address Info'}</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.inputStyle}
+                        placeholder="Name"
+                        value="Islamabad"
+                        editable={false}
+                    >
+                    </TextInput>
+                </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.inputStyle}
+                        placeholder="Postal Code"
+                        keyboardType="number-pad"
+                    >
+                    </TextInput>
+                </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.inputStyle}
+                        placeholder="Sector"
+                    >
+                    </TextInput>
+                </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.inputStyle}
+                        placeholder="Street No"
+                    >
+                    </TextInput>
+                </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.inputStyle}
+                        placeholder="House No"
+                    >
+                    </TextInput>
+                </View>
+                <Button title="Next" onPress={handlePress}>
+
+                </Button>
             </View>
         </SafeAreaView>
     )
@@ -72,12 +73,13 @@ const LoginScreen = ({
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'space-around',
+    },
+    headerContainer:{
     },
     contentContainer: {
         alignItems: 'center',
-        flex: 0.85,
-        justifyContent:'center',
+        flex:0.8,
     },
     headingStyle: {
         fontSize: moderateScale(30),
@@ -90,8 +92,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: Colors.lightOrange,
         marginVertical: verticalScale(15),
-        flexDirection:"row",
-        justifyContent:'space-between'
+        flexDirection:'row',
+        justifyContent:"space-between"
     },
     inputStyle: {
         marginHorizontal: horizontalScale(5),
@@ -100,27 +102,10 @@ const styles = StyleSheet.create({
         flex:1,
         fontFamily:Fonts.Family.SemiBold,
     },
-    underlineText:{
-        textDecorationLine:'underline',
-    },
-    termsContainer:{
-        flex:0.15,
-        justifyContent:'flex-end',
-        alignItems:"center",
-        marginBottom: verticalScale(5)
-    },
     eyeIcon:{
         marginHorizontal:horizontalScale(10),
         paddingVertical: verticalScale(10)
-    },
-    termsText:{
-        fontFamily:Fonts.Family.BoldItalic,
-        color: Colors.slateGrey
-    },
-    forgotPasswordText:{
-        fontFamily:Fonts.Family.SemiBold,
-        color: Colors.slateGrey
     }
 });
 
-export default LoginScreen
+export default AddressInfoScreen

@@ -10,7 +10,7 @@ import { FontAwesome as Icon } from "@expo/vector-icons";
 import Fonts from "../../theme/typographic";
 
 
-const LoginScreen = ({
+const ForgotPasswordScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
     const [passwordVisibility, setPasswordVisibility] = useState(true);
@@ -22,8 +22,11 @@ const LoginScreen = ({
     }, [])
     return (
         <SafeAreaView style={styles.mainContainer}>
+            <View >
+             <Header/>
+            </View>
             <View style={styles.contentContainer}>
-                <Text style={styles.headingStyle}>Login</Text>
+                <Text style={styles.headingStyle}>{'Forgot Password'}</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.inputStyle}
@@ -31,39 +34,8 @@ const LoginScreen = ({
                     >
                     </TextInput>
                 </View>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.inputStyle}
-                        placeholder="Password"
-                        secureTextEntry={passwordVisibility}
-                    >
-                    </TextInput>
-                    {passwordVisibility ?
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye-slash" size={20} color={"black"}
-                        onPress={()=>setPasswordVisibility(false)}
-                        />
-                        :
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye" size={20} color={"black"}
-                        onPress={()=>setPasswordVisibility(true)}
-                        />
-                        }
-                </View>
-                <Button title="Sign in" onPress={handlePress}>
+                <Button title="Send Email" onPress={handlePress}>
                 </Button>
-                <Button title="Create Account" onPress={handleCreateAccount}>
-                </Button>
-                <TouchableOpacity onPress={()=>{navigation.navigate('ForgotPasswordScreen')}}>
-                <Text style={styles.forgotPasswordText}>{'Forgot Password?'}</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.termsContainer}>
-                <Text style={styles.termsText}>{'You are agreeing to our '}
-                    <Text style={styles.underlineText}>terms and conditions</Text>
-                </Text>
             </View>
         </SafeAreaView>
     )
@@ -76,7 +48,7 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         alignItems: 'center',
-        flex: 0.85,
+        flex: 0.9,
         justifyContent:'center',
     },
     headingStyle: {
@@ -114,7 +86,7 @@ const styles = StyleSheet.create({
         paddingVertical: verticalScale(10)
     },
     termsText:{
-        fontFamily:Fonts.Family.BoldItalic,
+        fontFamily:Fonts.Family.MediumItalic,
         color: Colors.slateGrey
     },
     forgotPasswordText:{
@@ -123,4 +95,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default LoginScreen
+export default ForgotPasswordScreen
