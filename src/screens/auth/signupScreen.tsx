@@ -12,6 +12,10 @@ import Fonts from "../../theme/typographic";
 const SignupScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
+    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordVisibility, setPasswordVisibility] = useState(true);
     const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(true);
     const handlePress = useCallback(() => {
