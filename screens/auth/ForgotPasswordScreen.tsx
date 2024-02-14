@@ -1,24 +1,18 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../core/types";
-import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, SafeAreaView, StyleSheet } from "react-native";
 import { Colors } from "../../theme/color";
 import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
 import Button from "../../components/Button";
-import { FontAwesome as Icon } from "@expo/vector-icons";
 import Fonts from "../../theme/typographic";
 
 
 const ForgotPasswordScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
-    const [passwordVisibility, setPasswordVisibility] = useState(true);
     const handlePress = useCallback(() => {
-
-    }, [])
-    const handleCreateAccount = useCallback(() => {
-        navigation.navigate("SignupScreen");
     }, [])
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -72,27 +66,6 @@ const styles = StyleSheet.create({
         flex:1,
         fontFamily:Fonts.Family.SemiBold,
     },
-    underlineText:{
-        textDecorationLine:'underline',
-    },
-    termsContainer:{
-        flex:0.15,
-        justifyContent:'flex-end',
-        alignItems:"center",
-        marginBottom: verticalScale(5)
-    },
-    eyeIcon:{
-        marginHorizontal:horizontalScale(10),
-        paddingVertical: verticalScale(10)
-    },
-    termsText:{
-        fontFamily:Fonts.Family.MediumItalic,
-        color: Colors.slateGrey
-    },
-    forgotPasswordText:{
-        fontFamily:Fonts.Family.SemiBold,
-        color: Colors.slateGrey
-    }
 });
 
 export default ForgotPasswordScreen

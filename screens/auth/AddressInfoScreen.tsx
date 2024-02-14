@@ -1,25 +1,22 @@
 import React, { useCallback, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../core/types";
-import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, SafeAreaView, StyleSheet } from "react-native";
 import { Colors } from "../../theme/color";
 import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
 import Button from "../../components/Button";
-import { FontAwesome as Icon } from "@expo/vector-icons";
 import Fonts from "../../theme/typographic";
 
 const AddressInfoScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
-    const [passwordVisibility, setPasswordVisibility] = useState(true);
-    const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(true);
     const handlePress = useCallback(() => {
 
     }, [])
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={styles.headerContainer}>
+            <View >
              <Header/>
             </View>
             <View style={styles.contentContainer}>
@@ -75,8 +72,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-around',
     },
-    headerContainer:{
-    },
     contentContainer: {
         alignItems: 'center',
         flex:0.8,
@@ -102,10 +97,6 @@ const styles = StyleSheet.create({
         flex:1,
         fontFamily:Fonts.Family.SemiBold,
     },
-    eyeIcon:{
-        marginHorizontal:horizontalScale(10),
-        paddingVertical: verticalScale(10)
-    }
 });
 
 export default AddressInfoScreen
