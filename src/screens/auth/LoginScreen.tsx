@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../core/types";
-import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
+import { FormErrors, RootStackParamList } from "../../core/types";
+import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Colors } from "../../theme/color";
 import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
@@ -14,9 +14,34 @@ const LoginScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
     const [passwordVisibility, setPasswordVisibility] = useState(true);
-    const handlePress = useCallback(() => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState<FormErrors>({});
+    const resetState = () => {
+        setEmail('')
+        setPassword('')
+        setLoading(false)
+        setErrors({})
+    }
+    const validateForm = () => {
+        let validationErrors : FormErrors = {}
+        if (!email)
+        validationErrors.email = '*Email is required'
+        if(!password)
+        validationErrors.password = '*Password is required'
+        else if (password.length < 6)
+        validationErrors.password = 'Password must be atleast 6 characters long'
 
-    }, [])
+        setErrors(validationErrors)
+        return Object.keys(validationErrors).length === 0
+    }
+    const handlePress = useCallback(() => {
+        const isValid = validateForm()
+        if(isValid){
+            Alert.alert("GOOD")
+        }
+    }, [email, password])
     const handleCreateAccount = useCallback(() => {
         navigation.navigate("SignupScreen");
     }, [])
@@ -28,14 +53,19 @@ const LoginScreen = ({
                     <TextInput
                         style={styles.inputStyle}
                         placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
                     >
                     </TextInput>
                 </View>
+                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.inputStyle}
                         placeholder="Password"
                         secureTextEntry={passwordVisibility}
+                        value={password}
+                        onChangeText={setPassword}
                     >
                     </TextInput>
                     {passwordVisibility ?
@@ -52,6 +82,7 @@ const LoginScreen = ({
                         />
                         }
                 </View>
+                {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                 <Button title="Sign in" onPress={handlePress}>
                 </Button>
                 <Button title="Create Account" onPress={handleCreateAccount}>
@@ -120,6 +151,11 @@ const styles = StyleSheet.create({
     forgotPasswordText:{
         fontFamily:Fonts.Family.SemiBold,
         color: Colors.slateGrey
+    },
+    errorText:{
+        width:'73%',
+        color: Colors.error,
+        fontFamily:Fonts.Family.MediumItalic
     }
 });
 
