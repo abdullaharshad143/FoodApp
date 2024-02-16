@@ -6,6 +6,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './core/types';
 import {useFonts} from 'expo-font'
 import Fonts from './theme/typographic';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 
 export default function App() {

@@ -12,6 +12,7 @@
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
+    "dotenv": "^16.4.4",
     "expo": "~50.0.5",
     "expo-status-bar": "~1.11.1",
     "firebase": "^10.8.0",
