@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FormErrors, RootStackParamList } from "../../core/types";
 import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
@@ -8,10 +8,14 @@ import { horizontalScale, moderateScale, verticalScale } from "../../utils/respo
 import Button from "../../components/Button";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import Fonts from "../../theme/typographic";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../redux/users/userSlices";
+import { RootState } from "../../redux/store";
 
 const SignupScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
+    const dispatch = useDispatch();
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
@@ -20,6 +24,11 @@ const SignupScreen = ({
     const [loading, setLoading] = useState(false);
     const [passwordVisibility, setPasswordVisibility] = useState(true);
     const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(true);
+    const user = useSelector((state: RootState) => state.user);
+
+    useEffect(() => {
+        console.log(user);
+    }, [])
 
     const resetState = () => {
         setEmail('')
@@ -30,21 +39,24 @@ const SignupScreen = ({
         setLoading(false)
     }
 
-    const validateForm = ()=>{
+    const validateForm = () => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         let validationErrors: FormErrors = {}
-        if(!name){
+        if (!name) {
             validationErrors.name = '*Name is required'
         }
-        if(!email){
+        if (!email) {
             validationErrors.email = '*Email is required'
+        } else if (!emailRegex.test(email.trim())) {
+            validationErrors.email = '*Invalid Email Address'
         }
-        if(!password){
+        if (!password) {
             validationErrors.password = '*Password is required'
         }
-        else if (password.length < 6){
+        else if (password.length < 6) {
             validationErrors.password = '*Password must be at least 6 characters long'
         }
-        if(confirmPassword !== password){
+        if (confirmPassword !== password) {
             validationErrors.confirmPassword = 'Passwords do not match'
         }
         setErrors(validationErrors)
@@ -52,14 +64,16 @@ const SignupScreen = ({
     }
 
     const handlePress = useCallback(() => {
+        console.log(user);
         const isValid = validateForm()
-        if(isValid)
+        if (isValid)
+            dispatch(setUser({ name: name, email: email, password: password, uID: '' }))
         navigation.navigate('AddressInfoScreen')
     }, [name, email, password, confirmPassword])
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View>
-             <Header/>
+                <Header />
             </View>
             <View style={styles.contentContainer}>
                 <Text style={styles.headingStyle}>{'Create Account'}</Text>
@@ -92,19 +106,19 @@ const SignupScreen = ({
                         onChangeText={setPassword}
                     >
                     </TextInput>
-                        {passwordVisibility ?
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye-slash" size={20} color={"black"}
-                        onPress={()=>setPasswordVisibility(false)}
+                    {passwordVisibility ?
+                        <Icon
+                            style={styles.eyeIcon}
+                            name="eye-slash" size={20} color={"black"}
+                            onPress={() => setPasswordVisibility(false)}
                         />
                         :
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye" size={20} color={"black"}
-                        onPress={()=>setPasswordVisibility(true)}
+                        <Icon
+                            style={styles.eyeIcon}
+                            name="eye" size={20} color={"black"}
+                            onPress={() => setPasswordVisibility(true)}
                         />
-                        }
+                    }
                 </View>
                 {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                 <View style={styles.inputContainer}>
@@ -117,18 +131,18 @@ const SignupScreen = ({
                     >
                     </TextInput>
                     {confirmPasswordVisibility ?
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye-slash" size={20} color={"black"}
-                        onPress={()=>setConfirmPasswordVisibility(false)}
+                        <Icon
+                            style={styles.eyeIcon}
+                            name="eye-slash" size={20} color={"black"}
+                            onPress={() => setConfirmPasswordVisibility(false)}
                         />
                         :
-                        <Icon 
-                        style= {styles.eyeIcon}
-                        name = "eye" size={20} color={"black"}
-                        onPress={()=>setConfirmPasswordVisibility(true)}
+                        <Icon
+                            style={styles.eyeIcon}
+                            name="eye" size={20} color={"black"}
+                            onPress={() => setConfirmPasswordVisibility(true)}
                         />
-                        }
+                    }
                 </View>
                 {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
                 <Button title="Next" onPress={handlePress}>
@@ -146,7 +160,7 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         alignItems: 'center',
-        flex:0.75,
+        flex: 0.75,
     },
     headingStyle: {
         fontSize: moderateScale(30),
@@ -159,24 +173,25 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: Colors.lightOrange,
         marginVertical: verticalScale(15),
-        flexDirection:'row',
-        justifyContent:"space-between"
+        flexDirection: 'row',
+        justifyContent: "space-between"
     },
     inputStyle: {
         marginHorizontal: horizontalScale(5),
         paddingVertical: verticalScale(7),
         paddingHorizontal: horizontalScale(5),
-        flex:1,
-        fontFamily:Fonts.Family.SemiBold,
+        flex: 1,
+        fontFamily: Fonts.Family.SemiBold,
+        fontSize: moderateScale(16)
     },
-    eyeIcon:{
-        marginHorizontal:horizontalScale(10),
+    eyeIcon: {
+        marginHorizontal: horizontalScale(10),
         paddingVertical: verticalScale(10)
     },
-    errorText:{
-        width:'73%',
+    errorText: {
+        width: '73%',
         color: Colors.error,
-        fontFamily:Fonts.Family.MediumItalic
+        fontFamily: Fonts.Family.MediumItalic
     }
 });
 

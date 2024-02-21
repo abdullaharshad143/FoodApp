@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import AuthStack from './src/navigation/AuthStack';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './src/core/types';
 import {useFonts} from 'expo-font'
 import Fonts from './src/theme/typographic';
-
+import store from './src/redux/store'
+import { Provider } from 'react-redux';
 
 export default function App() {
   const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -25,22 +26,15 @@ export default function App() {
   }
   else{
     return (
-      <NavigationContainer>
+      <Provider store={store}>
+        <NavigationContainer>
         <Stack.Navigator
         screenOptions={{ headerShown: false}}
         >
           <Stack.Screen name = "Auth" component = {AuthStack}/>
         </Stack.Navigator>
       </NavigationContainer>
+      </Provider>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

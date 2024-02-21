@@ -1,6 +1,6 @@
 import React from "react";
 import {Text, TouchableOpacity, StyleSheet} from 'react-native'
-import { verticalScale } from "../utils/responsive";
+import { moderateScale, verticalScale } from "../utils/responsive";
 import Fonts from "../theme/typographic";
 
 
@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
     },
     textStyle:{
         textAlign:'center',
-        fontFamily: Fonts.Family.Bold
+        fontFamily: Fonts.Family.Bold,
+        fontSize: moderateScale(16)
     }
 })
 
