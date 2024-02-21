@@ -25,9 +25,13 @@ const LoginScreen = ({
         setErrors({})
     }
     const validateForm = () => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         let validationErrors : FormErrors = {}
-        if (!email)
+        if (!email){
         validationErrors.email = '*Email is required'
+        } else if (!emailRegex.test(email.trim())) {
+            validationErrors.email = '*Invalid Email Address'
+        }
         if(!password)
         validationErrors.password = '*Password is required'
         else if (password.length < 6)
@@ -130,6 +134,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: horizontalScale(5),
         flex:1,
         fontFamily:Fonts.Family.SemiBold,
+        fontSize: moderateScale(16)
     },
     underlineText:{
         textDecorationLine:'underline',

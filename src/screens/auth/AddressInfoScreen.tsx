@@ -7,6 +7,9 @@ import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
 import Button from "../../components/Button";
 import Fonts from "../../theme/typographic";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { setUser } from "../../redux/users/userSlices";
 
 const AddressInfoScreen = ({
     navigation,
@@ -18,6 +21,9 @@ const AddressInfoScreen = ({
     const [phoneNo, setPhoneNo] = useState('');
     const [note, setNote] = useState('');
     const [errors, setErrors] = useState<FormErrors>({})
+
+    const {name, email, password} = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch();
 
     const validateForm = () => {
         let validationErrors : FormErrors = {}
@@ -36,7 +42,24 @@ const AddressInfoScreen = ({
         }
     const handlePress = useCallback(() => {
         const isValid = validateForm()
-        if (isValid)
+        if (!isValid){
+            return
+        }
+        const address = {
+            postalCode,
+            sector,
+            streetNo,
+            houseNo,
+            phoneNo
+        }
+        dispatch(
+            setUser({
+                name,
+                email,
+                phoneNo,
+                address
+            })
+        )
         Alert.alert("Good")
     }, [postalCode, sector, streetNo, houseNo, phoneNo])
     return (
@@ -158,6 +181,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: horizontalScale(5),
         flex:1,
         fontFamily:Fonts.Family.SemiBold,
+        fontSize: moderateScale(16)
     },
     flexStyle:{
         flexDirection:'row'
