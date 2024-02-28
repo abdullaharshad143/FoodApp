@@ -19,3 +19,8 @@ export interface FormErrors {
     streetNo?: string
     houseNo?: string
 }
+
+export interface FirebaseAuthError extends Error {
+    code: string
+    message: string
+}

@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { FormErrors, RootStackParamList } from "../../core/types";
+import { FirebaseAuthError, FormErrors, RootStackParamList } from "../../core/types";
 import { View, Text, TextInput, SafeAreaView, StyleSheet, Alert, Keyboard } from "react-native";
 import { Colors } from "../../theme/color";
 import Header from "../../components/Header";
@@ -10,6 +10,9 @@ import Fonts from "../../theme/typographic";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { setUser } from "../../redux/users/userSlices";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../../config/firebase";
+import { Firestore, addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 const AddressInfoScreen = ({
     navigation,
@@ -20,12 +23,17 @@ const AddressInfoScreen = ({
     const [houseNo, setHouseNo] = useState('');
     const [phoneNo, setPhoneNo] = useState('');
     const [note, setNote] = useState('');
-    const [errors, setErrors] = useState<FormErrors>({})
+    const [errors, setErrors] = useState<FormErrors>({});
+    const [loading, setLoading] = useState(false);
 
     const {name, email, password} = useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        console.log("Inside Address Info Screen");
+    }, [])
     const validateForm = () => {
+        const phoneNoRegEx = /^(\+92|92|0)?[345678]\d{9}$/
         let validationErrors : FormErrors = {}
         if(!postalCode)
         validationErrors.postalCode = '*Postal Code is required'
@@ -35,12 +43,16 @@ const AddressInfoScreen = ({
         validationErrors.streetNo = '*Street No is required'
         if(!houseNo)
         validationErrors.houseNo = '*House No is required'
-        if(!phoneNo)
-        validationErrors.phoneNumber = '*Phone No is required'
+        if(!phoneNo){
+          validationErrors.phoneNumber = '*Phone No is required'
+        } else if (!phoneNoRegEx.test(phoneNo.trim())){
+            validationErrors.phoneNumber = '*Invalid Phone Number'
+            Alert.alert("Phone Number is invalid\ncorrect format is 03001234567")
+        }
         setErrors(validationErrors)
         return Object.keys(validationErrors).length === 0
         }
-    const handlePress = useCallback(() => {
+    const handlePress = useCallback( async () => {
         const isValid = validateForm()
         if (!isValid){
             return
@@ -50,17 +62,50 @@ const AddressInfoScreen = ({
             sector,
             streetNo,
             houseNo,
-            phoneNo
         }
-        dispatch(
-            setUser({
+        setLoading(true)
+       try {
+        if (email && password){
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email.trim(),
+                password
+            )
+            const user= userCredential.user
+            const userDocRef = doc(db, "users", user.uid);
+            await setDoc(userDocRef, {
+                email: user.email,
                 name,
-                email,
                 phoneNo,
                 address
-            })
-        )
-        Alert.alert("Good")
+            });
+            dispatch(
+                setUser({
+                    name,
+                    email,
+                    uID: user.uid,
+                    phoneNo,
+                    address
+                })
+            )
+            Alert.alert("User signedUp Successfully!");
+        }
+       } catch (e){
+        console.log(e)
+        const error = e as FirebaseAuthError
+        switch (error.code){
+            case 'auth/email-already-in-use':
+                Alert.alert("That email address is already in use!")
+                break
+            case 'auth/invalid-email':
+                break
+            default:
+                Alert.alert("An unexpected error occured!")
+        }
+       } finally {
+        setLoading(false)
+       }
+        
     }, [postalCode, sector, streetNo, houseNo, phoneNo])
     return (
         <SafeAreaView style={styles.mainContainer}>
@@ -145,7 +190,7 @@ const AddressInfoScreen = ({
                     >
                     </TextInput>
                 </View>
-                <Button title="Next" onPress={handlePress}>
+                <Button title="Next" loading={loading} onPress={handlePress}>
                 </Button>
             </View>
         </SafeAreaView>
