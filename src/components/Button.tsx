@@ -1,5 +1,5 @@
 import React from "react";
-import {Text, TouchableOpacity, StyleSheet} from 'react-native'
+import {Text, TouchableOpacity, StyleSheet, ActivityIndicator} from 'react-native'
 import { moderateScale, verticalScale } from "../utils/responsive";
 import Fonts from "../theme/typographic";
 
@@ -7,13 +7,22 @@ import Fonts from "../theme/typographic";
 interface ButtonProps {
     onPress : () => void;
     title: string
+    loading?: boolean
 }
 
-const Button: React.FC<ButtonProps> = ({onPress, title}) => {
+const Button: React.FC<ButtonProps> = ({onPress, title, loading}) => {
     return(
-        <TouchableOpacity style={styles.buttonStyle} onPress={onPress}>
+        <TouchableOpacity
+        style={[styles.buttonStyle]}
+        onPress={onPress}
+        disabled={loading}
+    >
+        {loading ? (
+            <ActivityIndicator size="small" color="#DFAB01" />
+        ) : (
             <Text style={styles.textStyle}>{title}</Text>
-        </TouchableOpacity>
+        )}
+    </TouchableOpacity>
     );
 }
 

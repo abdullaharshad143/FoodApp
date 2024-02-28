@@ -27,7 +27,7 @@ const SignupScreen = ({
     const user = useSelector((state: RootState) => state.user);
 
     useEffect(() => {
-        console.log(user);
+        console.log("Inside Sign Up Screen");
     }, [])
 
     const resetState = () => {
@@ -64,9 +64,10 @@ const SignupScreen = ({
     }
 
     const handlePress = useCallback(() => {
-        console.log(user);
         const isValid = validateForm()
-        if (isValid)
+        if (!isValid){
+            return;
+        }
             dispatch(setUser({ name: name, email: email, password: password, uID: '' }))
         navigation.navigate('AddressInfoScreen')
     }, [name, email, password, confirmPassword])
