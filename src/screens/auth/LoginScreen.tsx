@@ -13,6 +13,7 @@ import { auth, db } from "../../../config/firebase";
 import { Firestore, doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/users/userSlices";
+import { StackActions } from "@react-navigation/native";
 
 
 const LoginScreen = ({
@@ -71,7 +72,8 @@ const LoginScreen = ({
                                 address,
                                 uID: user.uid
                             }));
-                    Alert.alert("Login successfull")
+                    // Alert.alert("Login successfull")
+                    navigation.dispatch(StackActions.replace('HomeStack'))
                     }
                 } catch (error) {
                     // Handle Firestore document retrieval error

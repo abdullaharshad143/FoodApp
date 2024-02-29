@@ -8,6 +8,7 @@ import {useFonts} from 'expo-font'
 import Fonts from './src/theme/typographic';
 import store from './src/redux/store'
 import { Provider } from 'react-redux';
+import HomeStack from './src/navigation/HomeStack';
 
 export default function App() {
   const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -32,6 +33,7 @@ export default function App() {
         screenOptions={{ headerShown: false}}
         >
           <Stack.Screen name = "Auth" component = {AuthStack}/>
+          <Stack.Screen name = "HomeStack" component = {HomeStack}/>
         </Stack.Navigator>
       </NavigationContainer>
       </Provider>

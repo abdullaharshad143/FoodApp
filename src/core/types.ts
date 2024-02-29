@@ -4,6 +4,16 @@ export type RootStackParamList = {
     LoginScreen: undefined
     ForgotPasswordScreen: undefined
     AddressInfoScreen: undefined
+    BottomTab: undefined
+    HomeStack: {screen?: string}
+}
+
+export type RootBottomParamList = {
+    OrdersScreen: undefined
+    ProfileScreen: undefined
+    ContactScreen: undefined
+    HomeScreen: undefined
+    CartScreen: undefined
 }
 
 export interface FormErrors {
