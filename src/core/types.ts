@@ -1,3 +1,5 @@
+import { ImageProps } from "react-native"
+
 export type RootStackParamList = {
     SignupScreen: undefined
     Auth: undefined
@@ -33,4 +35,17 @@ export interface FormErrors {
 export interface FirebaseAuthError extends Error {
     code: string
     message: string
+}
+
+export interface IProduce {
+    // quantity: number | (() => number)
+    id: string
+    name: string
+    image: ImageProps
+    // type: string
+    marketPrice: string
+    subText: string
+    price: string
+    category: string
+    weight: string
 }
