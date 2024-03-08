@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FirebaseAuthError, FormErrors, RootStackParamList } from "../../core/types";
-import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, SafeAreaView, StyleSheet, TouchableOpacity, Alert, Keyboard } from "react-native";
 import { Colors } from "../../theme/color";
 import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
@@ -52,6 +52,7 @@ const LoginScreen = ({
     }
 
     const handleLogin = useCallback(() => {
+        Keyboard.dismiss();
         const isValid = validateForm();
         if (!isValid) {
             return;
