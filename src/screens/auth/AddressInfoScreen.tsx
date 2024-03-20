@@ -110,7 +110,7 @@ const AddressInfoScreen = ({
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View >
-             <Header/>
+             <Header top={verticalScale(-10)}/>
             </View>
             <View style={styles.contentContainer}>
                 <Text style={styles.headingStyle}>{'Address Info'}</Text>
