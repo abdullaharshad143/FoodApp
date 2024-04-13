@@ -50,9 +50,10 @@ const ProfileScreen = ({
                     <Text style={styles.infoStyle}>Street # {data.address.streetNo}</Text>
                     <Text style={styles.infoStyle}>Sector {data.address.sector}</Text>
                     <Text style={styles.infoStyle}>Postal Code {data.address.postalCode}</Text>
+                    <Text style={styles.infoStyle}>{data.address.note}</Text>
                 </View>
                 <View style={{ justifyContent: "center" }}>
-                    <TouchableOpacity style={styles.editButton}>
+                    <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("EditAddressInfoScreen")}>
                         <Icon name="pencil" size={13} color={"black"} />
                     </TouchableOpacity>
                 </View>
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: horizontalScale(20)
     },
     headingContainer: {
-        marginTop: verticalScale(150),
+        marginTop: verticalScale(120),
     },
     headingStyle: {
         fontFamily: Fonts.Family.Bold,
