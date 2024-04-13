@@ -3,6 +3,7 @@ import { RootStackParamList } from "../core/types";
 import BottomTab from './BottomTab'
 import { useEffect } from "react";
 import EditInfoScreen from "../EditScreens/EditInfoScreen";
+import EditAddressInfoScreen from "../EditScreens/EditAddressInfoScreen";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -14,6 +15,7 @@ export const HomeStack = () => {
         <Stack.Navigator screenOptions={{ headerShown: false}}>
             <Stack.Screen name = "BottomTab" component={BottomTab}/>
             <Stack.Screen name = "EditInfoScreen" component={EditInfoScreen}/>
+            <Stack.Screen name = "EditAddressInfoScreen" component={EditAddressInfoScreen}/>
         </Stack.Navigator>
     );
 }
