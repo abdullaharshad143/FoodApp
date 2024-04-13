@@ -4,14 +4,22 @@ import { horizontalScale, moderateScale, verticalScale } from "../utils/responsi
 import Fonts from "../theme/typographic"
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Colors } from "../theme/color";
-import SmallButton from "../components/smallButton";
+import SmallButton from "../components/SmallButton";
 import { useSelector } from "react-redux";
-const ProfileScreen = () => {
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../core/types";
+import { useEffect } from "react";
+const ProfileScreen = ({
+    navigation
+}: NativeStackScreenProps<RootStackParamList>) => {
     const data = useSelector((state: any) => state.user)
+    useEffect(() => {
+        console.log("Inside Profile Screen");
+    }, [])
     return (
         <ScrollView style={styles.mainContainer}>
             <View>
-                <Header top={50} text = "Hi Test bhai!" />   
+                <Header top={50} text = {`Hi ${data.name} !`} />   
             </View>
             <View style={styles.headingContainer}>
                 <Text style={styles.headingStyle}>{"Personal"}</Text>
@@ -23,8 +31,9 @@ const ProfileScreen = () => {
                 <View>
                     <Text style={styles.infoStyle}>{data.name}</Text>
                     <Text style={styles.infoStyle}>{data.email}</Text>
+                    <Text style={styles.infoStyle}>{data.phoneNo}</Text>
                 </View>
-                <TouchableOpacity style={styles.editButton}>
+                <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("EditInfoScreen")}>
                     <Icon name="pencil" size={13} color={"black"} />
                 </TouchableOpacity>
 

@@ -8,6 +8,7 @@ export type RootStackParamList = {
     AddressInfoScreen: undefined
     BottomTab: undefined
     HomeStack: {screen?: string}
+    EditInfoScreen: undefined
 }
 
 export type RootBottomParamList = {
