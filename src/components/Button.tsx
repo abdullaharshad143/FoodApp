@@ -5,7 +5,7 @@ import Fonts from "../theme/typographic";
 
 
 interface ButtonProps {
-    onPress : () => void;
+    onPress? : () => void;
     title: string
     loading?: boolean
 }
