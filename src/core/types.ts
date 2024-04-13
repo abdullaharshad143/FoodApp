@@ -10,6 +10,7 @@ export type RootStackParamList = {
     HomeStack: {screen?: string}
     EditInfoScreen: undefined
     EditAddressInfoScreen: undefined
+    AuthStack: {screen?: string}
 }
 
 export type RootBottomParamList = {

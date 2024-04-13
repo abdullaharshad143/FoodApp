@@ -5,16 +5,28 @@ import Fonts from "../theme/typographic"
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Colors } from "../theme/color";
 import SmallButton from "../components/SmallButton";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../core/types";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { clearUser, clearAddress } from "../redux/users/userSlices";
+import { StackActions } from "@react-navigation/native";
 const ProfileScreen = ({
     navigation
 }: NativeStackScreenProps<RootStackParamList>) => {
     const data = useSelector((state: any) => state.user)
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         console.log("Inside Profile Screen");
+    }, [])
+    const logout = useCallback (() => () => {
+        console.log("hafafvajfv")
+        setLoading(true);
+        dispatch(clearUser());
+        dispatch(clearAddress());
+        navigation.dispatch( StackActions.replace("AuthStack"))
+        setLoading(false);
     }, [])
     return (
         <ScrollView style={styles.mainContainer}>
@@ -94,7 +106,7 @@ const ProfileScreen = ({
             </View>
             <View style ={{alignItems:"center", marginVertical:20}}>
             <SmallButton title="Activate Subscription"/>
-            <SmallButton title="Logout"/>
+            <SmallButton title="Logout" loading={loading} onPress={logout()}/>
             <SmallButton title="Delete Account"/>
             </View>
         </ScrollView>

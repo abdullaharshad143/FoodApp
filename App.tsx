@@ -32,7 +32,7 @@ export default function App() {
         <Stack.Navigator
         screenOptions={{ headerShown: false}}
         >
-          <Stack.Screen name = "Auth" component = {AuthStack}/>
+          <Stack.Screen name = "AuthStack" component = {AuthStack}/>
           <Stack.Screen name = "HomeStack" component = {HomeStack}/>
         </Stack.Navigator>
       </NavigationContainer>
