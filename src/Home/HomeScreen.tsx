@@ -5,9 +5,13 @@ import { Colors } from "../theme/color"
 import SearchComponent from "../components/SearchComponent"
 import FoodCard from "../components/FoodCard"
 import Fonts from "../theme/typographic"
-import { IProduce } from "../core/types"
+import { IProduce, RootBottomParamList, RootStackParamList } from "../core/types"
+import FloatingButton from "../components/FloatingButton"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
 
-const HomeScreen = () => {
+const HomeScreen = ({ 
+    navigation,
+}: NativeStackScreenProps<RootBottomParamList>) => {
     useEffect(() => {
         console.log("Inside Home Screen")
     }, [])
@@ -43,7 +47,8 @@ const HomeScreen = () => {
         </View>
     );
     return (
-        <ScrollView style={styles.mainContainer}>
+        <View>
+            <ScrollView style={styles.mainContainer}>
             <SearchComponent />
             {renderCategory('Fruit')}
             {renderCategory('Vegetable')}
@@ -52,6 +57,8 @@ const HomeScreen = () => {
             {renderCategory('Fruit')}
             {renderCategory('Vegetable')}
         </ScrollView>
+        <FloatingButton navigation={navigation}/>
+        </View>
     )
 }
 
