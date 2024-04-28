@@ -8,7 +8,7 @@ const UpcomingOrders = () => {
         <View style={styles.mainContainer}>
             <View style={styles.contentContainer}>
                 <Icon name="calendar" size={30} color={"black"} />
-                <Text style={styles.textStyle}>{"No upcoming orders yet"}</Text>
+                <Text style={styles.textStyle}>{"No upcoming orders yet 😊"}</Text>
             </View>
         </View>
     )
