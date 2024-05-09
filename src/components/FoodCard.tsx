@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     },
     foodDetails: {
         flex: 1,
-        marginLeft: 10,
+        marginLeft: horizontalScale(10),
     },
     foodName: {
         fontSize: moderateScale(14),
@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
     foodPrice: {
         fontSize: moderateScale(14),
         fontFamily: Fonts.Family.Bold,
-        marginTop: 10,
+        marginTop: verticalScale(10),
     },
     foodMarketPrice: {
         fontSize: moderateScale(14),
         fontFamily: Fonts.Family.Bold,
-        marginTop: 10,
+        marginTop: verticalScale(10),
         marginHorizontal: horizontalScale(10),
         color: Colors.slateGrey,
         textDecorationLine: 'line-through'
@@ -121,14 +121,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     quantityText: {
-        marginHorizontal: 5,
+        marginHorizontal: horizontalScale(5),
         fontFamily: Fonts.Family.Bold,
         color: 'white',
-        fontSize: 16,
+        fontSize: moderateScale(16),
 
     },
     counterButton: {
-        marginHorizontal: 5,
+        marginHorizontal: horizontalScale(5),
         padding: 5,
         borderRadius: 15,
     },
