@@ -47,8 +47,8 @@ const HomeScreen = ({
         </View>
     );
     return (
-        <View>
-            <ScrollView style={styles.mainContainer}>
+        <View style={styles.mainContainer}>
+            <ScrollView style={styles.scrollView}>
             <SearchComponent />
             {renderCategory('Fruit')}
             {renderCategory('Vegetable')}
@@ -66,8 +66,12 @@ const styles = StyleSheet.create({
     mainContainer: {
         // flex: 1,
         // justifyContent: 'center',
-        paddingVertical: verticalScale(50),
+        paddingTop: verticalScale(50),
         backgroundColor: 'white',
+        paddingBottom:25
+    },
+    scrollView:{
+
     },
     categoryContainer: {
         marginBottom: 20,
