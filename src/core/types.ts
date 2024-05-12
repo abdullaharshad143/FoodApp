@@ -51,4 +51,5 @@ export interface IProduce {
     price: string
     category: string
     weight: string
+    quantity? : number
 }
