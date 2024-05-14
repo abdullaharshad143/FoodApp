@@ -1,42 +1,41 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, FlatList } from 'react-native';
 import { horizontalScale } from '../utils/responsive';
 import Fonts from '../theme/typographic';
-import { IProduce } from '../core/types';
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import { RootState } from '../redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { IProduce } from '../core/types';
+import { increaseQuantity, addItem, removeItem, decreaseQuantity } from '../redux/cart/cartSlices';
 
-const Cart: React.FC<{ item: IProduce }> = ({ item }) => {
-    const [quantity, setQuantity] = useState(0);
+const Cart = () => {
+    const cartItems = useSelector((state: RootState) => state.produce.items);
+    const dispatch = useDispatch();
     const [editQuantity, setEditQuantity] = useState(false);
-    const handleAddQuantity = useCallback(() => {
-        setEditQuantity(true)
-        setQuantity(quantity + 1);
-    }, [quantity])
-    const handleLessQuantity = useCallback(() => {
-        setEditQuantity(true)
-        if (quantity <= 0) {
-            return quantity
-        }
-        else {
-            setQuantity(quantity - 1);
-        }
-    }, [quantity])
-    const closeCounter = useCallback(() => {
-        setEditQuantity(false)
-    }, [editQuantity])
 
-    // for testing
-    const openCounter = useCallback(() => {
-        setEditQuantity(true);
-        if (quantity === 0) {
-            setQuantity(quantity + 1)
+    const handleAddQuantity = useCallback((item: IProduce) => {
+        const itemInCart = cartItems.find((cartItem: { id: string; }) => cartItem.id === item.id);
+        if (itemInCart) {
+            dispatch(increaseQuantity(item.id));
+        } else {
+            dispatch(addItem(item));
         }
-    }, [editQuantity])
+    }, [cartItems, dispatch]);
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.cardContainer}>
-                <>
+    const handleSubtractQuantity = useCallback((item: IProduce) => {
+        const itemInCart = cartItems.find((cartItem: { id: string; }) => cartItem.id === item.id);
+        if (itemInCart && itemInCart.quantity === 1) {
+            dispatch(removeItem(item.id));
+        } else {
+            dispatch(decreaseQuantity(item.id));
+        }
+    }, [cartItems, dispatch]);
+
+    const renderItem = ({ item }: { item: IProduce }) => {
+        const quantity = item.quantity || 0;
+        return (
+            <View style={styles.container}>
+                <View style={styles.cardContainer}>
                     <View style={styles.cardImage}>
                         <Image source={item.image} style={styles.cardImage} />
                     </View>
@@ -47,35 +46,43 @@ const Cart: React.FC<{ item: IProduce }> = ({ item }) => {
                         </View>
                     </View>
                     <View style={styles.countView}>
-                        <TouchableWithoutFeedback onPress={openCounter} onPressOut={closeCounter}>
+                        <TouchableWithoutFeedback onPressOut={() => setEditQuantity(false)}>
                             <View style={styles.directionrowstle}>
                                 {quantity > 0 && editQuantity ? (
                                     <>
                                         <TouchableOpacity
-                                            onPress={() =>
-                                                handleLessQuantity()
-                                            }
+                                            onPress={() => handleSubtractQuantity(item)}
                                             style={styles.button}
                                         >
                                             <Icon name='minus' size={15} color={"black"} />
                                         </TouchableOpacity>
                                         <Text style={styles.count}>{quantity}pc</Text>
                                         <TouchableOpacity
-                                            onPress={() => handleAddQuantity()}
+                                            onPress={() => handleAddQuantity(item)}
                                             style={styles.button}
                                         >
                                             <Icon name='plus' size={15} color={"black"} />
                                         </TouchableOpacity>
                                     </>
                                 ) : (
-                                    <Text style={styles.count}>{quantity}pc</Text>
+                                    <Text style={styles.count} onPress={() => setEditQuantity(true)}>{quantity}pc</Text>
                                 )}
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
-                </>
+                </View>
             </View>
-        </View>
+        );
+    };
+
+    return (
+        <FlatList
+            data={cartItems}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            style={{}}
+            showsVerticalScrollIndicator={false}
+        />
     );
 }
 

@@ -17,7 +17,7 @@ const ForgotPasswordScreen = ({
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View >
-             <Header/>
+                <Header top={10} />
             </View>
             <View style={styles.contentContainer}>
                 <Text style={styles.headingStyle}>{'Forgot Password'}</Text>
@@ -38,12 +38,13 @@ const ForgotPasswordScreen = ({
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        color: Colors.authBackground
     },
     contentContainer: {
         alignItems: 'center',
         flex: 0.9,
-        justifyContent:'center',
+        justifyContent: 'center',
     },
     headingStyle: {
         fontSize: moderateScale(30),
@@ -56,15 +57,15 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: Colors.lightOrange,
         marginVertical: verticalScale(15),
-        flexDirection:"row",
-        justifyContent:'space-between'
+        flexDirection: "row",
+        justifyContent: 'space-between'
     },
     inputStyle: {
         marginHorizontal: horizontalScale(5),
         paddingVertical: verticalScale(7),
         paddingHorizontal: horizontalScale(5),
-        flex:1,
-        fontFamily:Fonts.Family.SemiBold,
+        flex: 1,
+        fontFamily: Fonts.Family.SemiBold,
     },
 });
 

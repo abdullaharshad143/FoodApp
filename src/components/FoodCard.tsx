@@ -5,23 +5,36 @@ import { Colors } from '../theme/color';
 import Fonts from '../theme/typographic';
 import { IProduce } from '../core/types';
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import { addItem, increaseQuantity, decreaseQuantity, removeItem } from '../redux/cart/cartSlices';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 const FoodCard: React.FC<{ item: IProduce }> = ({ item }) => {
-    const [quantity, setQuantity] = useState(0);
+    const dispatch = useDispatch(); // Initialize useDispatch hook
+    const cartItems = useSelector((state: RootState) => state.produce.items);
+    const cartItem = cartItems.find((cartItem: { id: string; }) => cartItem.id === item.id);
+    const quantity = cartItem ? cartItem.quantity : 0;
     const [editQuantity, setEditQuantity] = useState(false);
     const handleAddQuantity = useCallback(() => {
         setEditQuantity(true)
-        setQuantity(quantity + 1);
-    }, [quantity])
+        const itemInCart = cartItems.find((cartItem: { id: string; }) => cartItem.id === item.id);
+        if (itemInCart) {
+            dispatch(increaseQuantity(item.id));
+        } else {
+            dispatch(addItem(item));
+        }
+    }, [quantity, dispatch, cartItems, item])
     const handleSubtractQuantity = useCallback(() => {
         setEditQuantity(true)
+        if (item.quantity === 1) {
+            dispatch(removeItem(item.id));
+        } else {
+            dispatch(decreaseQuantity(item.id));
+        }
         if (quantity <= 0) {
             return quantity
         }
-        else {
-            setQuantity(quantity - 1);
-        }
-    }, [quantity])
+    }, [quantity, dispatch, cartItems, item])
     const closeCounter = useCallback(() => {
         setEditQuantity(false)
     }, [editQuantity])
