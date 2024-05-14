@@ -7,10 +7,10 @@ export type RootStackParamList = {
     ForgotPasswordScreen: undefined
     AddressInfoScreen: undefined
     BottomTab: undefined
-    HomeStack: {screen?: string}
+    HomeStack: { screen?: string }
     EditInfoScreen: undefined
     EditAddressInfoScreen: undefined
-    AuthStack: {screen?: string}
+    AuthStack: { screen?: string }
 }
 
 export type RootBottomParamList = {
@@ -41,7 +41,7 @@ export interface FirebaseAuthError extends Error {
 }
 
 export interface IProduce {
-    // quantity: number | (() => number)
+    items?: any
     id: string
     name: string
     image: ImageProps
@@ -51,5 +51,5 @@ export interface IProduce {
     price: string
     category: string
     weight: string
-    quantity? : number
+    quantity?: number
 }

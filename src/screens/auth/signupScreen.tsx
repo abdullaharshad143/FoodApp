@@ -65,10 +65,10 @@ const SignupScreen = ({
 
     const handlePress = useCallback(() => {
         const isValid = validateForm()
-        if (!isValid){
+        if (!isValid) {
             return;
         }
-            dispatch(setUser({ name: name, email: email, password: password, uID: '' }))
+        dispatch(setUser({ name: name, email: email, password: password, uID: '' }))
         navigation.navigate('AddressInfoScreen')
     }, [name, email, password, confirmPassword])
     return (
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         justifyContent: 'space-around',
+        backgroundColor: Colors.authBackground
     },
     contentContainer: {
         alignItems: 'center',

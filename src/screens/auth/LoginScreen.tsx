@@ -73,8 +73,8 @@ const LoginScreen = ({
                                 address,
                                 uID: user.uid
                             }));
-                    // Alert.alert("Login successfull")
-                    navigation.dispatch(StackActions.replace('HomeStack'))
+                        // Alert.alert("Login successfull")
+                        navigation.dispatch(StackActions.replace('HomeStack'))
                     }
                 } catch (error) {
                     // Handle Firestore document retrieval error
@@ -142,7 +142,7 @@ const LoginScreen = ({
                     }
                 </View>
                 {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-                <Button title="Sign in" onPress={handleLogin} loading = {loading}>
+                <Button title="Sign in" onPress={handleLogin} loading={loading}>
                 </Button>
                 <Button title="Create Account" onPress={handleCreateAccount}>
                 </Button>
@@ -162,7 +162,8 @@ const LoginScreen = ({
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: Colors.authBackground
     },
     contentContainer: {
         alignItems: 'center',
