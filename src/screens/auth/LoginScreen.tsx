@@ -14,6 +14,7 @@ import { Firestore, doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/users/userSlices";
 import { StackActions } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const LoginScreen = ({
@@ -74,6 +75,7 @@ const LoginScreen = ({
                                 uID: user.uid
                             }));
                         // Alert.alert("Login successfull")
+                        await AsyncStorage.setItem('userId', user.uid)
                         navigation.dispatch(StackActions.replace('HomeStack'))
                     }
                 } catch (error) {

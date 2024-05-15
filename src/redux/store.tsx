@@ -1,18 +1,30 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { persistReducer, persistStore } from "redux-persist";
 import { UserInfo, userReducer } from "./users/userSlices";
 import { produceSlicer } from "./cart/cartSlices";
 import { IProduce } from "../core/types";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface RootState {
   user: UserInfo
   produce: IProduce
 }
-
+const persistConfig = {
+  key: 'user',
+  storage: AsyncStorage,
+};
+const persistedUserReducer = persistReducer(persistConfig, userReducer);
 const store = configureStore({
   reducer: {
-    user: userReducer,
-    produce: produceSlicer
-  }
+    user: persistedUserReducer,
+    produce: produceSlicer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }),
 });
+export const persistor = persistStore(store);
 
 export default store;

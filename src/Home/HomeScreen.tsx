@@ -8,6 +8,7 @@ import Fonts from "../theme/typographic"
 import { IProduce, RootBottomParamList, RootStackParamList } from "../core/types"
 import FloatingButton from "../components/FloatingButton"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import React from "react"
 
 const HomeScreen = ({
     navigation,

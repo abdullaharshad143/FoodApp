@@ -1,3 +1,4 @@
+import React from "react";
 import { Text, StyleSheet, View } from "react-native"
 import Fonts from "../theme/typographic"
 import { FontAwesome as Icon } from "@expo/vector-icons";

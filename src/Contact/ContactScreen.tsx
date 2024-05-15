@@ -1,3 +1,4 @@
+import React from "react";
 import { Text, View, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native"
 import { Colors } from "../theme/color"
 import Header from "../components/Header"
@@ -13,7 +14,7 @@ const ContactScreen = ({
     return (
         <SafeAreaView style={styles.mainContainer}>
             <View>
-                <Header top={verticalScale(-40)}/>
+                <Header top={verticalScale(-40)} />
             </View>
             <View style={styles.contentConatiner}>
                 <View style={{ alignItems: 'center' }}>

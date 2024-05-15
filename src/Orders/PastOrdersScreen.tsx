@@ -1,3 +1,4 @@
+import React from "react";
 import { Text, View, StyleSheet } from "react-native"
 import Fonts from "../theme/typographic"
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"

@@ -1,3 +1,4 @@
+import React from "react";
 import { Text, View, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
 import Header from "../components/Header"
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"
@@ -11,6 +12,7 @@ import { RootStackParamList } from "../core/types";
 import { useCallback, useEffect, useState } from "react";
 import { clearUser, clearAddress } from "../redux/users/userSlices";
 import { StackActions } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const ProfileScreen = ({
     navigation
 }: NativeStackScreenProps<RootStackParamList>) => {
@@ -20,18 +22,18 @@ const ProfileScreen = ({
     useEffect(() => {
         console.log("Inside Profile Screen");
     }, [])
-    const logout = useCallback (() => () => {
-        console.log("hafafvajfv")
+    const logout = useCallback(() => async () => {
         setLoading(true);
         dispatch(clearUser());
         dispatch(clearAddress());
-        navigation.dispatch( StackActions.replace("AuthStack"))
+        await AsyncStorage.clear()
+        navigation.dispatch(StackActions.replace("AuthStack"))
         setLoading(false);
     }, [])
     return (
         <ScrollView style={styles.mainContainer}>
             <View>
-                <Header top={50} text = {`Hi ${data.name} !`} />   
+                <Header top={50} text={`Hi ${data.name} !`} />
             </View>
             <View style={styles.headingContainer}>
                 <Text style={styles.headingStyle}>{"Personal"}</Text>
@@ -45,7 +47,7 @@ const ProfileScreen = ({
                     <Text style={styles.infoStyle}>{data.email}</Text>
                     <Text style={styles.infoStyle}>{data.phoneNo}</Text>
                 </View>
-                <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("EditInfoScreen")}>
+                <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("EditInfoScreen")}>
                     <Icon name="pencil" size={13} color={"black"} />
                 </TouchableOpacity>
 
@@ -65,7 +67,7 @@ const ProfileScreen = ({
                     <Text style={styles.infoStyle}>{data.address.note}</Text>
                 </View>
                 <View style={{ justifyContent: "center" }}>
-                    <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("EditAddressInfoScreen")}>
+                    <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("EditAddressInfoScreen")}>
                         <Icon name="pencil" size={13} color={"black"} />
                     </TouchableOpacity>
                 </View>
@@ -104,10 +106,10 @@ const ProfileScreen = ({
                 </View>
 
             </View>
-            <View style ={{alignItems:"center", marginVertical:20}}>
-            <SmallButton title="Activate Subscription"/>
-            <SmallButton title="Logout" loading={loading} onPress={logout()}/>
-            <SmallButton title="Delete Account"/>
+            <View style={{ alignItems: "center", marginVertical: 20 }}>
+                <SmallButton title="Activate Subscription" />
+                <SmallButton title="Logout" loading={loading} onPress={logout()} />
+                <SmallButton title="Delete Account" />
             </View>
         </ScrollView>
     )
