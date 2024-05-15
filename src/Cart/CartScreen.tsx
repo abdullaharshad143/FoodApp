@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView, Text } from "react-native"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { verticalScale } from "../utils/responsive"
 import { IProduce, RootBottomParamList, } from "../core/types"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"

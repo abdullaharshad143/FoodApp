@@ -1,3 +1,4 @@
+import React from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text, View, StyleSheet } from "react-native";
 import { RootStackParamList } from "../core/types";
@@ -36,7 +37,7 @@ const OrdersScreen = ({
             style={styles.tabBar}
             labelStyle={styles.label}
             renderLabel={({ route, focused, color }) => (
-                <Text style={[styles.labelText, {color: focused ? 'black' : 'grey',}]}>
+                <Text style={[styles.labelText, { color: focused ? 'black' : 'grey', }]}>
                     {route.title}
                 </Text>
             )}
@@ -69,9 +70,9 @@ const styles = StyleSheet.create({
     label: {
         color: 'black', // Customize tab label color
     },
-    labelText:{
+    labelText: {
         fontFamily: Fonts.Family.SemiBold,
-        fontSize: 20 
+        fontSize: 20
     }
 });
 

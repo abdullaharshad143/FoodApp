@@ -1,3 +1,4 @@
+import React from "react";
 import { TextInput, View, StyleSheet } from "react-native";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Colors } from "../theme/color";

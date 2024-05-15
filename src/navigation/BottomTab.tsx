@@ -1,3 +1,4 @@
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RootBottomParamList } from "../core/types";
 import HomeScreen from "../Home/HomeScreen";
@@ -43,7 +44,7 @@ const BottomTab = () => {
                         />
                 }}
             />
-             <Tab.Screen name="CartScreen" component={CartScreen}
+            <Tab.Screen name="CartScreen" component={CartScreen}
                 options={{
                     tabBarAllowFontScaling: false,
                     title: 'Cart',

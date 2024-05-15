@@ -13,6 +13,7 @@ import { setUser } from "../../redux/users/userSlices";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../../config/firebase";
 import { Firestore, addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { StackActions } from "@react-navigation/native";
 
 const AddressInfoScreen = ({
     navigation,
@@ -88,7 +89,8 @@ const AddressInfoScreen = ({
                         address
                     })
                 )
-                Alert.alert("User signedUp Successfully!");
+                // Alert.alert("User signedUp Successfully!");
+                navigation.dispatch(StackActions.replace('HomeStack'))
             }
         } catch (e) {
             console.log(e)
