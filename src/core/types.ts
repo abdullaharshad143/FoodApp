@@ -11,6 +11,7 @@ export type RootStackParamList = {
     EditInfoScreen: undefined
     EditAddressInfoScreen: undefined
     AuthStack: { screen?: string }
+    PaymentCardScreen: undefined
 }
 
 export type RootBottomParamList = {
