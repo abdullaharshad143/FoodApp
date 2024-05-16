@@ -87,7 +87,7 @@ const ProfileScreen = ({
                     <Text style={styles.infoStyle}>Default Card</Text>
                 </View>
                 <View style={{ justifyContent: "center" }}>
-                    <TouchableOpacity style={styles.editButton}>
+                    <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("PaymentCardScreen")}>
                         <Icon name="pencil" size={13} color={"black"} />
                     </TouchableOpacity>
                 </View>

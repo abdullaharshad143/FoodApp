@@ -41,6 +41,7 @@ export default function App() {
   useEffect(() => {
     const gotoLogin = async () => {
       const userId = await AsyncStorage.getItem('userId')
+      console.log(userId)
       if (userId) {
         setNavigationRead1y('HomeStack')
       } else {
@@ -51,9 +52,10 @@ export default function App() {
     gotoLogin()
   }, [])
   if (!isNavigationReady) {
-    return null
+    return <ActivityIndicator size="large" color="#0000ff" />;
   }
   const persistor = persistStore(store)
+  console.log(isNavigationRead1y);
   if (!fontsLoaded) {
     // Render a loading indicator or fallback UI while fonts are being loaded
     return <ActivityIndicator size="large" color="#0000ff" />;
