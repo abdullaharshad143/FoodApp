@@ -48,8 +48,9 @@ export interface IProduce {
     // type: string
     marketPrice: string
     subText: string
-    price: string
+    price: number
     category: string
     weight: string
     quantity?: number
+    totalPrice?: number
 }

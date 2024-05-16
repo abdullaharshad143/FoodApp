@@ -5,14 +5,17 @@ import { FontAwesome as Icon } from "@expo/vector-icons";
 import Fonts from "../theme/typographic";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootBottomParamList, RootStackParamList } from "../core/types";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const FloatingButton = ({
     navigation,
 }: NativeStackScreenProps<RootBottomParamList>) => {
+    const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
     return (
         <TouchableOpacity onPress={() => navigation.navigate("CartScreen")} style={styles.mainCointainer}>
             <Icon name="shopping-cart" size={22} color={"black"} />
-            <Text style={styles.textStyle}>{'$40.29'}</Text>
+            <Text style={styles.textStyle}>Rs {totalPrice}</Text>
         </TouchableOpacity>
     )
 }

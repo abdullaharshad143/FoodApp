@@ -4,21 +4,28 @@ import Fonts from "../theme/typographic"
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Colors } from "../theme/color";
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 const PaymentDetails = () => {
+    const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
+    let priceWithDelivery = 150
+    if(totalPrice){
+        priceWithDelivery += totalPrice
+    }
     return (
         <View style={styles.mainContainer}>
             <View style={styles.flexDirection}>
                 <Text style={styles.textStyle}>{'Produce Total'}</Text>
-                <Text style={styles.textStyle}>${'100'}</Text>
+                <Text style={styles.textStyle}>Rs {totalPrice}</Text>
             </View>
             <View style={styles.flexDirection}>
                 <Text style={styles.textStyle}>{'Delivery Fee'}</Text>
-                <Text style={styles.textStyle}>${'6.99'}</Text>
+                <Text style={styles.textStyle}>Rs {'150'}</Text>
             </View>
             <View style={styles.flexDirection}>
                 <Text style={styles.textStyle}>{'Total Amount'}</Text>
-                <Text style={styles.textStyle}>${'106.99'}</Text>
+                <Text style={styles.textStyle}>Rs {priceWithDelivery}</Text>
             </View>
             <View style={styles.deliveryDetailsContainer}>
                 <View style={styles.flex}>
