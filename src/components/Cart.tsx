@@ -42,7 +42,7 @@ const Cart = () => {
                     <Text style={styles.textOrdername}>{item.name}</Text>
                     <View style={styles.textmainView}>
                         <View style={styles.directionrowstle}>
-                            <Text style={styles.textQtyPrice}>${item.price}</Text>
+                            <Text style={styles.textQtyPrice}>Rs {item.price}</Text>
                         </View>
                     </View>
                     <View style={styles.countView}>

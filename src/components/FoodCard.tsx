@@ -68,11 +68,12 @@ const FoodCard: React.FC<{ item: IProduce }> = ({ item }) => {
             <Image source={item.image} style={styles.foodImage} />
             <View style={styles.foodDetails}>
                 <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.foodPrice}>{item.price}</Text>
-                    <Text style={styles.foodMarketPrice}>{item.marketPrice}</Text>
+                    <Text style={styles.foodPrice}>Rs {item.price}</Text>
+                    <Text style={styles.foodMarketPrice}>Rs {item.marketPrice}</Text>
                 </View>
                 <Text style={styles.foodName}>{item.name}</Text>
                 <Text style={styles.foodSubText}>{item.subText}</Text>
+                <Text style={styles.foodSubText}>{item.weight}</Text>
                 {/* Add more details if needed */}
             </View>
         </View>

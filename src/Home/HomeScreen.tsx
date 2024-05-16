@@ -17,11 +17,11 @@ const HomeScreen = ({
         console.log("Inside Home Screen")
     }, [])
     const foodData: IProduce[] = [
-        { id: '1', name: 'Apple', price: '1.99', marketPrice: '$2.49', subText: 'Fresh and juicy', category: 'Fruit', weight: '0.5kg', image: require('../assets/apples.jpg') },
-        { id: '2', name: 'Banana', price: '0.99', marketPrice: '$1.29', subText: 'Rich in potassium', category: 'Fruit', weight: '0.3kg', image: require('../assets/apples.jpg') },
-        { id: '3', name: 'Carrot', price: '0.79', marketPrice: '$0.99', subText: 'High in Vitamin A', category: 'Vegetable', weight: '0.2kg', image: require('../assets/apples.jpg') },
-        { id: '4', name: 'Orange', price: '1.49', marketPrice: '$1.99', subText: 'Source of Vitamin C', category: 'Fruit', weight: '0.4kg', image: require('../assets/apples.jpg') },
-        { id: '5', name: 'Broccoli', price: '1.29', marketPrice: '$1.79', subText: 'Nutrient-rich', category: 'Vegetable', weight: '0.3kg', image: require('../assets/apples.jpg') },
+        { id: '1', name: 'Apple', price: 199, marketPrice: '2.49', subText: 'Fresh and juicy', category: 'Fruit', weight: '1kg', image: require('../assets/apples.jpg') },
+        { id: '2', name: 'Banana', price: 99, marketPrice: '1.29', subText: 'Rich in potassium', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
+        { id: '3', name: 'Carrot', price: 79, marketPrice: '0.99', subText: 'High in Vitamin A', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
+        { id: '4', name: 'Orange', price: 149, marketPrice: '1.99', subText: 'Source of Vitamin C', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
+        { id: '5', name: 'Broccoli', price: 129, marketPrice: '1.79', subText: 'Nutrient-rich', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
         // Add more food items as needed
     ];
 
