@@ -13,6 +13,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from './config/firebase';
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
+import Constants from 'expo-constants';
+  
 
 export default function App() {
   const Stack = createNativeStackNavigator<RootStackParamList>()
