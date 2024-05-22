@@ -9,6 +9,7 @@ import { IProduce, RootBottomParamList, RootStackParamList } from "../core/types
 import FloatingButton from "../components/FloatingButton"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React from "react"
+import OrderScheduled from "../components/OrderScheduled"
 
 const HomeScreen = ({
     navigation,
@@ -48,7 +49,11 @@ const HomeScreen = ({
         </View>
     );
     return (
-        <SafeAreaView style={styles.mainContainer}>
+        <>
+        {false ? (
+            <OrderScheduled onPress={()=>navigation.navigate("CartScreen")}/>
+        ): (
+            <SafeAreaView style={styles.mainContainer}>
             <ScrollView style={styles.scrollView}>
                 <SearchComponent />
                 {renderCategory('Fruit')}
@@ -60,6 +65,8 @@ const HomeScreen = ({
             </ScrollView>
             <FloatingButton navigation={navigation} />
         </SafeAreaView>
+        )}
+        </>
     )
 }
 
