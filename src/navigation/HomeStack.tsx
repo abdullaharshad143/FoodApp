@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import EditInfoScreen from "../EditScreens/EditInfoScreen";
 import EditAddressInfoScreen from "../EditScreens/EditAddressInfoScreen";
 import PaymentCardScreen from "../PaymentCard/PaymentCardScreen";
+import SubscribeAndSaveScreen from "../Subscription/SubscribeAndSaveScreen";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -19,6 +20,7 @@ export const HomeStack = () => {
             <Stack.Screen name="EditInfoScreen" component={EditInfoScreen} />
             <Stack.Screen name="EditAddressInfoScreen" component={EditAddressInfoScreen} />
             <Stack.Screen name="PaymentCardScreen" component={PaymentCardScreen}/>
+            <Stack.Screen name="SubscribeAndSaveScreen" component={SubscribeAndSaveScreen}/>
         </Stack.Navigator>
     );
 }

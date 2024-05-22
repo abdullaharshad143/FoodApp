@@ -1,7 +1,7 @@
 import { View, StyleSheet, ScrollView, Text } from "react-native"
 import React, { useEffect } from "react"
 import { verticalScale } from "../utils/responsive"
-import { IProduce, RootBottomParamList, } from "../core/types"
+import { IProduce, RootBottomParamList, RootStackParamList, } from "../core/types"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import PaymentDetails from "../components/PaymentDetails"
 import Header from "../components/Header"
@@ -14,7 +14,7 @@ import { clearCart } from "../redux/cart/cartSlices"
 
 const CartScreen = ({
     navigation,
-}: NativeStackScreenProps<RootBottomParamList>) => {
+}: NativeStackScreenProps<RootStackParamList>) => {
     useEffect(() => {
         console.log("Inside Cart Screen")
     }, [])
@@ -38,7 +38,7 @@ const CartScreen = ({
                         <PaymentDetails />
                     </View>
                     <View style={styles.buttonContiner}>
-                        <SmallButton title="Checkout" onPress={() => alert("OK")} />
+                        <SmallButton title="Checkout" onPress={() => navigation.navigate("SubscribeAndSaveScreen")}/>
                     </View>
                 </ScrollView>
             ) : (
