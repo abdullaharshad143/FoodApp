@@ -13,6 +13,7 @@ export type RootStackParamList = {
     AuthStack: { screen?: string }
     PaymentCardScreen: undefined
     SubscribeAndSaveScreen: undefined
+    SearchScreen: undefined
 }
 
 export type RootBottomParamList = {
@@ -22,6 +23,7 @@ export type RootBottomParamList = {
     HomeScreen: undefined
     CartScreen: undefined
     ScheduledScreen: undefined
+    SearchScreen: undefined
 }
 
 export interface FormErrors {

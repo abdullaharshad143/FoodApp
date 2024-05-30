@@ -7,6 +7,7 @@ import EditInfoScreen from "../EditScreens/EditInfoScreen";
 import EditAddressInfoScreen from "../EditScreens/EditAddressInfoScreen";
 import PaymentCardScreen from "../PaymentCard/PaymentCardScreen";
 import SubscribeAndSaveScreen from "../Subscription/SubscribeAndSaveScreen";
+import SearchScreen from "../Search/SearchScreen";
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -19,8 +20,9 @@ export const HomeStack = () => {
             <Stack.Screen name="BottomTab" component={BottomTab} />
             <Stack.Screen name="EditInfoScreen" component={EditInfoScreen} />
             <Stack.Screen name="EditAddressInfoScreen" component={EditAddressInfoScreen} />
-            <Stack.Screen name="PaymentCardScreen" component={PaymentCardScreen}/>
-            <Stack.Screen name="SubscribeAndSaveScreen" component={SubscribeAndSaveScreen}/>
+            <Stack.Screen name="PaymentCardScreen" component={PaymentCardScreen} />
+            <Stack.Screen name="SubscribeAndSaveScreen" component={SubscribeAndSaveScreen} />
+            <Stack.Screen name="SearchScreen" component={SearchScreen} />
         </Stack.Navigator>
     );
 }

@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, ListRenderItem, SafeAreaView, ActivityIndicator } from "react-native"
+import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, ListRenderItem, SafeAreaView, ActivityIndicator, TouchableOpacity } from "react-native"
 import { useCallback, useEffect, useState } from "react"
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"
 import { Colors } from "../theme/color"
@@ -18,6 +18,7 @@ import { setItems } from "../redux/cart/cartSlices"
 import { useDispatch } from "react-redux"
 import { setUser } from "../redux/users/userSlices"
 import { useFocusEffect } from "@react-navigation/native"
+import { FontAwesome as Icon } from "@expo/vector-icons";
 
 const HomeScreen = ({
     navigation,
@@ -125,7 +126,10 @@ const HomeScreen = ({
         <>
             <SafeAreaView style={styles.mainContainer}>
                 <ScrollView style={styles.scrollView}>
-                    <SearchComponent />
+                    <TouchableOpacity onPress={() => navigation.navigate("SearchScreen")} style={styles.searchContainer}>
+                        <Icon style={{ marginHorizontal: 10 }} name="search" size={25} color={Colors.lightGrey} />
+                        <Text style={styles.textStyle}>{"Search"}</Text>
+                    </TouchableOpacity>
                     {renderCategory('Fruit')}
                     {renderCategory('Vegetable')}
                     {renderCategory('Dairy')}
@@ -175,6 +179,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignContent: 'center',
         backgroundColor: 'white'
+    },
+    searchContainer: {
+        borderWidth: 1,
+        borderRadius: 20,
+        width: '90%',
+        alignSelf: 'center',
+        paddingVertical: 8,
+        margin: 10,
+        borderColor: Colors.lightGrey,
+        flexDirection: 'row'
+    },
+    textStyle: {
+        marginHorizontal: 5,
+        flex: 1,
+        fontFamily: Fonts.Family.SemiBold,
+        textAlignVertical: 'center',
+        color: 'grey'
     }
 });
 
