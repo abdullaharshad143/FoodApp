@@ -4,13 +4,21 @@ import { FontAwesome as Icon } from "@expo/vector-icons";
 import { Colors } from "../theme/color";
 import Fonts from "../theme/typographic";
 
-const SearchComponent = () => {
+interface SearchComponentProps {
+    query: string;
+    onSearch: (text: string) => void;
+}
+
+const SearchComponent: React.FC<SearchComponentProps> = ({ query, onSearch }) => {
     return (
         <View style={styles.mainContainer}>
             <Icon style={{ marginHorizontal: 10 }} name="search" size={25} color={Colors.lightGrey} />
             <TextInput
                 placeholder="Search"
                 style={styles.inputStyle}
+                value={query}
+                onChangeText={onSearch}
+                autoFocus={true}
             />
         </View>
     );
@@ -32,5 +40,6 @@ const styles = StyleSheet.create({
         flex: 1,
         fontFamily: Fonts.Family.SemiBold
     }
-})
+});
+
 export default SearchComponent;
