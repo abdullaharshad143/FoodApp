@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     textStyle: {
         marginLeft: horizontalScale(5),
         fontFamily: Fonts.Family.Bold,
-        fontSize: 17
+        fontSize:  17
     }
 })
 export default FloatingButton
