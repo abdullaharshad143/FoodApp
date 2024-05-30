@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, TouchableOpacity } from "react-native"
+import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, TouchableOpacity, ActivityIndicator } from "react-native"
 import { useCallback, useEffect, useState } from "react"
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"
 import { Colors } from "../theme/color"
@@ -14,6 +14,10 @@ import SmallButton from "../components/SmallButton"
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import Button from "../components/Button"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { collection, doc, setDoc, updateDoc } from "firebase/firestore"
+import { db } from "../../config/firebase"
+
 
 const SubscribeAndSaveScreen = ({
     navigation,
@@ -24,7 +28,11 @@ const SubscribeAndSaveScreen = ({
     const [twoWeeksFrequency, setTwoWeeksFrequency] = useState(false)
     const [threeWeeksFrequency, setThreeWeeksFrequency] = useState(false)
     const [fourWeeksFrequency, setfourWeeksFrequency] = useState(false)
+    const [frequency, setFrequency] = useState(1)
+    const [loading, setLoading] = useState(false)
     const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
+    const cartItems = useSelector((state: RootState) => state.produce.items);
+    // console.log(cartItems)
     let priceWithDelivery = 150
     if (totalPrice) {
         priceWithDelivery += totalPrice
@@ -36,6 +44,7 @@ const SubscribeAndSaveScreen = ({
         setSelectSubscription(true)
     }, [])
     const oneTimeSelection = useCallback(() => {
+        setFrequency(0)
         setSelectSubscription(false)
         setSelectOneTime(true)
         setWeeklyFrequency(false)
@@ -45,31 +54,72 @@ const SubscribeAndSaveScreen = ({
     }, [])
     const weeklyFrequencySelection = useCallback(() => {
         setWeeklyFrequency(true)
+        setFrequency(1)
         setTwoWeeksFrequency(false)
         setThreeWeeksFrequency(false)
         setfourWeeksFrequency(false)
     }, [])
     const twoWeeksFrequencySelection = useCallback(() => {
+        setFrequency(2)
         setWeeklyFrequency(false)
         setTwoWeeksFrequency(true)
         setThreeWeeksFrequency(false)
         setfourWeeksFrequency(false)
     }, [])
     const threeWeeksFrequencySelection = useCallback(() => {
+        setFrequency(3)
         setWeeklyFrequency(false)
         setTwoWeeksFrequency(false)
         setThreeWeeksFrequency(true)
         setfourWeeksFrequency(false)
     }, [])
     const fourWeeksFrequencySelection = useCallback(() => {
+        setFrequency(4)
         setWeeklyFrequency(false)
         setTwoWeeksFrequency(false)
         setThreeWeeksFrequency(false)
         setfourWeeksFrequency(true)
     }, [])
-    const handleCheckout = useCallback(() => {
-        navigation.navigate("HomeScreen")
-    }, [])
+    const handleCheckout = useCallback(async () => {
+        setLoading(true)
+        const userId = await AsyncStorage.getItem('userId')
+        const orderData = {
+            userId,
+            orderedItems: cartItems,
+            totalPrice: selectOneTime ? oneTimePrice : priceWithDelivery,
+            status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
+            frequency: frequency
+        }
+
+        try {
+            if (selectOneTime) {
+                const oneTimeDocRef = doc(collection(db, "oneTime"));
+                await setDoc(oneTimeDocRef, orderData);
+                const userDocRef = doc(db, "users", userId || "");
+                await updateDoc(userDocRef, {
+                    orderCollectionId: oneTimeDocRef.id,
+                });
+            } else {
+                const subscriptionDocRef = doc(collection(db, "subscription"));
+                await setDoc(subscriptionDocRef, orderData);
+                const userDocRef = doc(db, "users", userId || "");
+                await updateDoc(userDocRef, {
+                    orderCollectionId: subscriptionDocRef.id,
+                });
+            }
+            const userDocRef = doc(db, "users", userId || "");
+            await updateDoc(userDocRef, {
+                status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
+                subscriptionType: selectOneTime ? 'One Time' : 'Subscription',
+            });
+            navigation.navigate("ScheduledScreen")
+        } catch (error) {
+            console.error("Error adding document: ", error)
+        }
+        finally {
+            setLoading(false)
+        }
+    }, [selectOneTime, cartItems, totalPrice, navigation])
     useEffect(() => {
         console.log("Inside Subscribe and Save Screen")
     }, [])
@@ -116,7 +166,13 @@ const SubscribeAndSaveScreen = ({
                 <Text style={styles.saveText}>{"*You can subscriibe and easily pause all future orders and save Rs 200"}</Text>
             </View>
             <View style={styles.checkoutButton}>
-                <Button title={selectSubscription ? `Checkout Rs ${priceWithDelivery}` : `Checkout Rs ${oneTimePrice}`} onPress={handleCheckout} />
+                {loading ? (
+                    <>
+                        <ActivityIndicator size={"large"} color={Colors.lightOrange} />
+                    </>
+                ) : (
+                    <Button title={selectSubscription ? `Checkout Rs ${priceWithDelivery}` : `Checkout Rs ${oneTimePrice}`} onPress={handleCheckout} />
+                )}
             </View>
         </View>
     )

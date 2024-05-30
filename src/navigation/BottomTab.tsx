@@ -11,6 +11,7 @@ import { moderateScale, verticalScale } from "../utils/responsive";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { Colors } from "../theme/color";
+import ScheduledScreen from "../OrderScheduled/ScheduledScreen";
 
 const Tab = createBottomTabNavigator<RootBottomParamList>()
 
@@ -44,6 +45,17 @@ const BottomTab = () => {
                         />
                 }}
             />
+            <Tab.Screen name="ScheduledScreen" component={ScheduledScreen}
+                options={{
+                    tabBarAllowFontScaling: false,
+                    title: 'Scheduled',
+                    tabBarIcon: ({ focused }) =>
+                        <Icon name='calendar-check-o'
+                            color={focused ? Colors.blackText : Colors.lightGrey}
+                            size={14}
+                        />
+                }}
+            />
             <Tab.Screen name="CartScreen" component={CartScreen}
                 options={{
                     tabBarAllowFontScaling: false,
@@ -66,7 +78,7 @@ const BottomTab = () => {
                         />
                 }}
             />
-            <Tab.Screen name="ContactScreen" component={ContactScreen}
+            {/* <Tab.Screen name="ContactScreen" component={ContactScreen}
                 options={{
                     tabBarAllowFontScaling: false,
                     title: 'Contact',
@@ -76,7 +88,7 @@ const BottomTab = () => {
                             size={17}
                         />
                 }}
-            />
+            /> */}
             <Tab.Screen name="ProfileScreen" component={ProfileScreen}
                 options={{
                     tabBarAllowFontScaling: false,

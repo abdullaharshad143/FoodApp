@@ -19,6 +19,7 @@ const CartScreen = ({
         console.log("Inside Cart Screen")
     }, [])
     const cartItems = useSelector((state: RootState) => state.produce.items);
+    const status = useSelector((state: any) => state.user.status);
     const dispatch = useDispatch();
     const clearTheCart = () => {
         dispatch(clearCart());
@@ -38,7 +39,11 @@ const CartScreen = ({
                         <PaymentDetails />
                     </View>
                     <View style={styles.buttonContiner}>
-                        <SmallButton title="Checkout" onPress={() => navigation.navigate("SubscribeAndSaveScreen")}/>
+                        {status === "ACTIVE" || status === "SCHEDULED" ? (
+                            <SmallButton title="Update" onPress={() => navigation.navigate("SubscribeAndSaveScreen")} />
+                        ) : (
+                            <SmallButton title="Checkout" onPress={() => navigation.navigate("SubscribeAndSaveScreen")} />
+                        )}
                     </View>
                 </ScrollView>
             ) : (

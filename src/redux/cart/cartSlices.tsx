@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { IProduce } from '../../core/types';
-
+import { current } from 'immer';
 interface ProduceState {
     items: (IProduce & { quantity: number })[];
     totalPrice: number; // Separate variable for total price
@@ -49,9 +49,21 @@ const produceSlice = createSlice({
             state.items = [];
             state.totalPrice = 0; // Reset total price when clearing cart
         },
+        setItems(state, action: PayloadAction<(IProduce & { quantity: number })[]>) {
+            // Initialize items array directly within the reducer
+            state.items = [];
+            state.totalPrice = 0;
+
+            // Add each item to the state with the correct type
+            action.payload.forEach(item => {
+                //@ts-ignore
+                state.items.push(item);
+                state.totalPrice += item.price * item.quantity;
+            });
+        },
     },
 });
 
-export const { addItem, removeItem, increaseQuantity, decreaseQuantity, clearCart } = produceSlice.actions;
+export const { setItems, addItem, removeItem, increaseQuantity, decreaseQuantity, clearCart } = produceSlice.actions;
 
 export const produceReducer = produceSlice.reducer;

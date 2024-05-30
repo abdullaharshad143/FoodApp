@@ -6,13 +6,14 @@ export interface UserInfo {
     password: string
     uID: string
     phoneNumber: string
-    address:{
+    address: {
         postalCode?: string
         sector?: string
         streetNo?: string
         houseNo?: string
         deliveryNote?: string
-    }
+    },
+    status: string,
 }
 
 const initialState: UserInfo = {
@@ -21,19 +22,20 @@ const initialState: UserInfo = {
     password: '',
     uID: '',
     phoneNumber: '',
-    address:{
+    address: {
         postalCode: '',
         sector: '',
         streetNo: '',
         houseNo: '',
         deliveryNote: '',
-    }
+    },
+    status: '',
 }
 
 export const usersSlices = createSlice({
     name: 'users',
     initialState: initialState,
-    reducers:{
+    reducers: {
         setUser: (state, action) => {
             return {
                 ...state,
@@ -46,18 +48,19 @@ export const usersSlices = createSlice({
                 ...action.payload
             }
         },
-        clearAddress : (state) => {
+        clearAddress: (state) => {
             state.address = {}
         },
         clearUser: (state) => {
             state.name = '',
-            state.email = '',
-            state.password = '',
-            state.uID = '',
-            state.phoneNumber = ''
+                state.email = '',
+                state.password = '',
+                state.uID = '',
+                state.phoneNumber = ''
+            state.status = '';
         },
     },
 })
 
-export const { setUser, setAddress, clearAddress, clearUser} = usersSlices.actions
+export const { setUser, setAddress, clearAddress, clearUser } = usersSlices.actions
 export const userReducer = usersSlices.reducer

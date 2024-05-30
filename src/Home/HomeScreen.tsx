@@ -1,5 +1,5 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, ListRenderItem, SafeAreaView } from "react-native"
-import { useEffect } from "react"
+import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, ListRenderItem, SafeAreaView, ActivityIndicator } from "react-native"
+import { useCallback, useEffect, useState } from "react"
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"
 import { Colors } from "../theme/color"
 import SearchComponent from "../components/SearchComponent"
@@ -10,26 +10,99 @@ import FloatingButton from "../components/FloatingButton"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React from "react"
 import OrderScheduled from "../components/OrderScheduled"
+import { foodData } from "./data"
+import { collection, doc, getDoc, getDocs } from "firebase/firestore"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { db } from "../../config/firebase"
+import { setItems } from "../redux/cart/cartSlices"
+import { useDispatch } from "react-redux"
+import { setUser } from "../redux/users/userSlices"
+import { useFocusEffect } from "@react-navigation/native"
 
 const HomeScreen = ({
     navigation,
 }: NativeStackScreenProps<RootBottomParamList>) => {
+    const [loading, setLoading] = useState(false)
+    const dispatch = useDispatch();
     useEffect(() => {
         console.log("Inside Home Screen")
     }, [])
-    const foodData: IProduce[] = [
-        { id: '1', name: 'Apple', price: 199, marketPrice: '2.49', subText: 'Fresh and juicy', category: 'Fruit', weight: '1kg', image: require('../assets/apples.jpg') },
-        { id: '2', name: 'Banana', price: 99, marketPrice: '1.29', subText: 'Rich in potassium', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
-        { id: '3', name: 'Carrot', price: 79, marketPrice: '0.99', subText: 'High in Vitamin A', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
-        { id: '4', name: 'Orange', price: 149, marketPrice: '1.99', subText: 'Source of Vitamin C', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
-        { id: '5', name: 'Broccoli', price: 129, marketPrice: '1.79', subText: 'Nutrient-rich', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
-        // Add more food items as needed
-    ];
+    useFocusEffect(
+        useCallback(() => {
+            getUser();
+        }, [])
+    );
+    const getUser = async () => {
+        setLoading(true)
+        try {
+            const userId = await AsyncStorage.getItem('userId');
+            const userDocRef = doc(db, "users", userId || "");
+            const userDocSnapShot = await getDoc(userDocRef);
+
+            if (userDocSnapShot.exists()) {
+                const { status } = userDocSnapShot.data();
+                if (status === "ACTIVE" || status === "SCHEDULED") {
+                    let orderedItems: IProduce[] = []; // Initialize orderedItems array
+
+                    if (status === "ACTIVE") {
+                        const oneTimeRef = collection(db, "subscription");
+                        const snapshot = await getDocs(oneTimeRef);
+                        orderedItems = snapshot.docs
+                            .map(doc => doc.data().orderedItems)
+                            .flat();
+                    } else if (status === "SCHEDULED") {
+                        const subscriptionRef = collection(db, "oneTime");
+                        const snapshot = await getDocs(subscriptionRef);
+                        orderedItems = snapshot.docs
+                            .map(doc => doc.data().orderedItems)
+                            .flat();
+                    }
+                    dispatch(
+                        setUser({
+                            status: status
+                        })
+                    )
+                    //@ts-ignore
+                    dispatch(setItems(orderedItems));
+                }
+                if (!status) {
+                    dispatch(
+                        setUser({
+                            status: ""
+                        })
+                    )
+                }
+            }
+        } catch (error) {
+            console.error("Error getting user document:", error);
+            // Handle error as needed
+        }
+        finally {
+            setLoading(false)
+        }
+    };
+
+    // const foodData: IProduce[] = [
+    //     { id: '1', name: 'Apple', price: 199, marketPrice: '2.49', subText: 'Fresh and juicy', category: 'Fruit', weight: '1kg', image: require('../assets/apples.jpg') },
+    //     { id: '2', name: 'Banana', price: 99, marketPrice: '1.29', subText: 'Rich in potassium', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
+    //     { id: '3', name: 'Carrot', price: 79, marketPrice: '0.99', subText: 'High in Vitamin A', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
+    //     { id: '4', name: 'Orange', price: 149, marketPrice: '1.99', subText: 'Source of Vitamin C', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
+    //     { id: '5', name: 'Broccoli', price: 129, marketPrice: '1.79', subText: 'Nutrient-rich', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
+    //     // Add more food items as needed
+    // ];
 
     // Function to render individual food item
     const renderItem: ListRenderItem<IProduce> = ({ item }) => (
         <FoodCard item={item} />
     );
+
+    if (loading) {
+        return (
+            <View style={styles.loaderStyle}>
+                <ActivityIndicator size={"large"} color={Colors.lightOrange} />
+            </View>
+        )
+    }
 
     // Function to render category
     const renderCategory = (category: string) => (
@@ -50,22 +123,21 @@ const HomeScreen = ({
     );
     return (
         <>
-        {false ? (
-            <OrderScheduled onPress={()=>navigation.navigate("CartScreen")}/>
-        ): (
             <SafeAreaView style={styles.mainContainer}>
-            <ScrollView style={styles.scrollView}>
-                <SearchComponent />
-                {renderCategory('Fruit')}
-                {renderCategory('Vegetable')}
-                {renderCategory('Fruit')}
-                {renderCategory('Vegetable')}
-                {renderCategory('Fruit')}
-                {renderCategory('Vegetable')}
-            </ScrollView>
-            <FloatingButton navigation={navigation} />
-        </SafeAreaView>
-        )}
+                <ScrollView style={styles.scrollView}>
+                    <SearchComponent />
+                    {renderCategory('Fruit')}
+                    {renderCategory('Vegetable')}
+                    {renderCategory('Dairy')}
+                    {renderCategory('Meat & Poultry')}
+                    {renderCategory('Seafood')}
+                    {renderCategory('Grains')}
+                    {renderCategory('Beverages')}
+                    {renderCategory('Snacks')}
+                </ScrollView>
+
+                <FloatingButton onPress={() => navigation.navigate("CartScreen")} />
+            </SafeAreaView>
         </>
     )
 }
@@ -97,6 +169,12 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.Family.Bold,
         alignSelf: 'flex-end',
         color: Colors.lightGrey
+    },
+    loaderStyle: {
+        flex: 1,
+        justifyContent: 'center',
+        alignContent: 'center',
+        backgroundColor: 'white'
     }
 });
 
