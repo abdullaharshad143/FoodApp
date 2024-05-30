@@ -17,6 +17,7 @@ const ProfileScreen = ({
     navigation
 }: NativeStackScreenProps<RootStackParamList>) => {
     const data = useSelector((state: any) => state.user)
+    const status = data.status
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     useEffect(() => {
@@ -87,7 +88,7 @@ const ProfileScreen = ({
                     <Text style={styles.infoStyle}>Default Card</Text>
                 </View>
                 <View style={{ justifyContent: "center" }}>
-                    <TouchableOpacity style={styles.editButton} onPress={()=>navigation.navigate("PaymentCardScreen")}>
+                    <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("PaymentCardScreen")}>
                         <Icon name="pencil" size={13} color={"black"} />
                     </TouchableOpacity>
                 </View>
@@ -107,7 +108,18 @@ const ProfileScreen = ({
 
             </View>
             <View style={{ alignItems: "center", marginVertical: 20 }}>
-                <SmallButton title="Activate Subscription" />
+                {status === "PAUSE" && (
+                    <SmallButton title="Activate Subscription" />
+                )}
+                {status === "ACTIVE" && (
+                    <SmallButton title="Pause Subscription" />
+                )}
+                {status === "SCHEDULED" && (
+                    <SmallButton title="Cancel Order" />
+                )}
+                {status === "ACTIVE" && (
+                    <SmallButton title="Cancel Subscription" />
+                )}
                 <SmallButton title="Logout" loading={loading} onPress={logout()} />
                 <SmallButton title="Delete Account" />
             </View>

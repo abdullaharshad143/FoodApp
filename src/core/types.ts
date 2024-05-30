@@ -21,6 +21,7 @@ export type RootBottomParamList = {
     ContactScreen: undefined
     HomeScreen: undefined
     CartScreen: undefined
+    ScheduledScreen: undefined
 }
 
 export interface FormErrors {

@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
     textStyle: {
         fontFamily: Fonts.Family.SemiBold,
         fontSize: 18,
-        color: "grey"
     },
     lightTextStyle: {
         fontFamily: Fonts.Family.Regular,
