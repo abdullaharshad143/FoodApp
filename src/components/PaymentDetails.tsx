@@ -6,9 +6,14 @@ import { Colors } from "../theme/color";
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { formatDate, getNextDayOfWeek } from "../utils/date";
 
 const PaymentDetails = () => {
     const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
+    const saturdaydate = getNextDayOfWeek(6)
+    const tuesdayDate = getNextDayOfWeek(2);
+    const saturdayFormattedDate = formatDate(saturdaydate)
+    const tuesdayFormattedDate = formatDate(tuesdayDate)
     let priceWithDelivery = 150
     if(totalPrice){
         priceWithDelivery += totalPrice
@@ -33,7 +38,7 @@ const PaymentDetails = () => {
                         <Icon name="credit-card" size={30} color={'black'} style={styles.iconStyle} />
                     </View>
                     <View>
-                        <Text style={[styles.textStyle, styles.margin]}>{'Billing Saturday'}</Text>
+                        <Text style={[styles.textStyle, styles.margin]}>{`Billing on ${saturdayFormattedDate}`}</Text>
                         <Text style={[styles.lightTextStyle, styles.margin]}>{'At cut-off 11:59 pm'}</Text>
                     </View>
                 </View>
@@ -42,7 +47,7 @@ const PaymentDetails = () => {
                         <Icon name="truck" size={30} color={'black'} style={styles.iconStyle} />
                     </View>
                     <View>
-                        <Text style={[styles.textStyle, styles.margin]}>{'Delivery Tuesday'}</Text>
+                        <Text style={[styles.textStyle, styles.margin]}>{`Delivery on ${tuesdayFormattedDate}`}</Text>
                         <Text style={[styles.lightTextStyle, styles.margin]}>{'Before 6:30 pm'}</Text>
                     </View>
                 </View>

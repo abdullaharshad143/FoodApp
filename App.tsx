@@ -54,13 +54,18 @@ export default function App() {
     gotoLogin()
   }, [])
   if (!isNavigationReady) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={{justifyContent:'center', alignSelf:'center'}}>
+        <ActivityIndicator size="large" color="#FFD08A" />
+      </View>
+    );
   }
   const persistor = persistStore(store)
   console.log(isNavigationRead1y);
   if (!fontsLoaded) {
-    // Render a loading indicator or fallback UI while fonts are being loaded
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    <View style={{justifyContent:'center', alignSelf:'center'}}>
+        <ActivityIndicator size="large" color="#FFD08A" />
+      </View>
   }
   else {
     return (

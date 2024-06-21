@@ -192,7 +192,7 @@ const AddressInfoScreen = ({
                     >
                     </TextInput>
                 </View>
-                <Button title="Next" loading={loading} onPress={handlePress}>
+                <Button title="Sign-up" loading={loading} onPress={handlePress}>
                 </Button>
             </View>
         </SafeAreaView>
