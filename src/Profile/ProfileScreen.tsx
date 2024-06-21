@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
+import { Text, View, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from "react-native"
 import Header from "../components/Header"
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"
 import Fonts from "../theme/typographic"
@@ -10,9 +10,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../core/types";
 import { useCallback, useEffect, useState } from "react";
-import { clearUser, clearAddress } from "../redux/users/userSlices";
+import { clearUser, clearAddress, setUser } from "../redux/users/userSlices";
 import { StackActions } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../config/firebase";
 const ProfileScreen = ({
     navigation
 }: NativeStackScreenProps<RootStackParamList>) => {
@@ -31,6 +33,86 @@ const ProfileScreen = ({
         navigation.dispatch(StackActions.replace("AuthStack"))
         setLoading(false);
     }, [])
+
+    const updateSubscriptionStatus = useCallback(async (status: string) => {
+        let msg;
+        if (status === "ACTIVE") {
+            msg = "Are you sure you want to Activate the subscription?"
+        } else if (status === "PAUSE") {
+            msg = "Are you sure you want to Pause the subscription?"
+        } else {
+            msg = "Are you sure you want to Cancel the subscription?"
+        }
+        Alert.alert(
+            "Confirm",
+            msg,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Action cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "Yes",
+                    onPress: async () => {
+                        setLoading(true)
+                        const userId = await AsyncStorage.getItem('userId');
+                        if (!userId) {
+                            console.error("User ID not found");
+                            setLoading(false);
+                            return;
+                        }
+
+                        const userDocRef = doc(db, "users", userId);
+                        const userDoc = await getDoc(userDocRef);
+
+                        if (userDoc.exists()) {
+                            await updateDoc(userDocRef, {
+                                status: status,
+                            });
+                            const userData = userDoc.data();
+                            const orderId = userData.orderId;
+
+                            if (!orderId) {
+                                console.error("Order ID not found in user document");
+                                setLoading(false);
+                                return;
+                            }
+
+                            const subscriptionDocRef = doc(db, "subscription", orderId);
+                            const subscriptionDoc = await getDoc(subscriptionDocRef);
+
+                            if (subscriptionDoc.exists()) {
+                                await updateDoc(subscriptionDocRef, {
+                                    status: status,
+                                });
+                                dispatch(setUser({ status: status }));
+                                setLoading(false)
+                                alert("Subscription Updated!");
+                                console.log(`Subscription status updated to ${status}`);
+                            }
+                            // } else {
+                            //     const oneTimeDocRef = doc(db, "oneTime", orderId);
+                            //     const oneTimeDoc = await getDoc(oneTimeDocRef);
+
+                            //     if (oneTimeDoc.exists()) {
+                            //         await updateDoc(oneTimeDocRef, {
+                            //             status: status,
+                            //         });
+                            //         console.log(`One-time order status updated to ${status}`);
+                            //     } else {
+                            //         console.error("Order ID not found in subscription or one-time collections");
+                            //     }
+                            // }
+                        } else {
+                            console.error("User document not found");
+                        }
+                    }
+                }
+            ]
+        );
+    }, []);
+
     return (
         <ScrollView style={styles.mainContainer}>
             <View>
@@ -107,22 +189,28 @@ const ProfileScreen = ({
                 </View>
 
             </View>
-            <View style={{ alignItems: "center", marginVertical: 20 }}>
-                {status === "PAUSE" && (
-                    <SmallButton title="Activate Subscription" />
-                )}
-                {status === "ACTIVE" && (
-                    <SmallButton title="Pause Subscription" />
-                )}
-                {status === "SCHEDULED" && (
-                    <SmallButton title="Cancel Order" />
-                )}
-                {status === "ACTIVE" && (
-                    <SmallButton title="Cancel Subscription" />
-                )}
-                <SmallButton title="Logout" loading={loading} onPress={logout()} />
-                <SmallButton title="Delete Account" />
-            </View>
+            {loading ? (
+                <View style={{ marginTop: 50, alignSelf: 'center' }}>
+                    <ActivityIndicator size={'large'} color={Colors.lightOrange} />
+                </View>
+            ) : (
+                <View style={{ alignItems: "center", marginVertical: 20 }}>
+                    {status === "PAUSE" && (
+                        <SmallButton title="Activate Subscription" onPress={() => updateSubscriptionStatus("ACTIVE")} />
+                    )}
+                    {status === "ACTIVE" && (
+                        <SmallButton title="Pause Subscription" onPress={() => updateSubscriptionStatus("PAUSE")} />
+                    )}
+                    {status === "SCHEDULED" && (
+                        <SmallButton title="Cancel Order" onPress={() => updateSubscriptionStatus("CANCELLED")} />
+                    )}
+                    {status === "ACTIVE" && (
+                        <SmallButton title="Cancel Subscription" onPress={() => updateSubscriptionStatus("CANCELLED")} />
+                    )}
+                    <SmallButton title="Logout" loading={loading} onPress={logout()} />
+                    <SmallButton title="Delete Account" />
+                </View>
+            )}
         </ScrollView>
     )
 }

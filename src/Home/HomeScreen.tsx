@@ -42,10 +42,10 @@ const HomeScreen = ({
 
             if (userDocSnapShot.exists()) {
                 const { status } = userDocSnapShot.data();
-                if (status === "ACTIVE" || status === "SCHEDULED") {
+                if (status === "ACTIVE" || status === "SCHEDULED" || status === "PAUSE") {
                     let orderedItems: IProduce[] = []; // Initialize orderedItems array
 
-                    if (status === "ACTIVE") {
+                    if (status === "ACTIVE" || status === "PAUSE") {
                         const oneTimeRef = collection(db, "subscription");
                         const snapshot = await getDocs(oneTimeRef);
                         orderedItems = snapshot.docs
