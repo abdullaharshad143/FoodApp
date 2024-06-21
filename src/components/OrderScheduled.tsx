@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, TouchableOpacity, StyleSheet, ActivityIndicator, View } from 'react-native'
 import { moderateScale, verticalScale } from "../utils/responsive";
 import Fonts from "../theme/typographic";
 import { Colors } from "../theme/color";
 import Button from "./Button";
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import { formatDate, getNextDayOfWeek } from "../utils/date";
 
 
 interface OrderScheduledProps {
@@ -12,6 +13,12 @@ interface OrderScheduledProps {
 }
 
 const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
+    useEffect (()=>{
+    }, [])
+    const saturdaydate = getNextDayOfWeek(6)
+    const tuesdayDate = getNextDayOfWeek(2);
+    const saturdayFormattedDate = formatDate(saturdaydate)
+    const tuesdayFormattedDate = formatDate(tuesdayDate)
     return (
         <View style={styles.mainContainer}>
             <Text style={styles.headingStyle}>{"Order Scheduled"}</Text>
@@ -20,7 +27,7 @@ const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
                     <Icon style={styles.iconStyle} name="credit-card" size={25} color={"black"} />
                 </View>
                 <View>
-                    <Text style={styles.textStyle}>{"Billing comming Saturday  "}</Text>
+                    <Text style={styles.textStyle}>{`Billing on ${saturdayFormattedDate}`}</Text>
                     <Text style={styles.lightTextStyle}>{"At cut off 11:59pm"}</Text>
                 </View>
             </View>
@@ -29,7 +36,7 @@ const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
                     <Icon style={styles.iconStyle} name="truck" size={25} color={"black"} />
                 </View>
                 <View>
-                    <Text style={styles.textStyle}>{"Delivery comming Tuesday"}</Text>
+                    <Text style={styles.textStyle}>{`Delivery on ${tuesdayFormattedDate}`}</Text>
                     <Text style={styles.lightTextStyle}>{"Before 6:30pm"}</Text>
                 </View>
             </View>
