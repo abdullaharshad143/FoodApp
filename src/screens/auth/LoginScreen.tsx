@@ -54,10 +54,12 @@ const LoginScreen = ({
 
     const handleLogin = useCallback(() => {
         Keyboard.dismiss();
-        const isValid = validateForm();
-        if (!isValid) {
-            return;
+        
+        // If can not validate the form
+        if (!validateForm()) {
+            return; // return void
         }
+        
         setLoading(true);
         signInWithEmailAndPassword(auth, email, password)
             .then(async ({ user }) => {
