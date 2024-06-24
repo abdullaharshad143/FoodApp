@@ -36,13 +36,17 @@ const ProfileScreen = ({
 
     const updateSubscriptionStatus = useCallback(async (status: string) => {
         let msg;
-        if (status === "ACTIVE") {
-            msg = "Are you sure you want to Activate the subscription?"
-        } else if (status === "PAUSE") {
-            msg = "Are you sure you want to Pause the subscription?"
-        } else {
-            msg = "Are you sure you want to Cancel the subscription?"
-        }
+        switch (status) {
+            case "ACTIVE":
+                msg = "Are you sure you want to Activate the subscription?";
+                break;
+            case "PAUSE":
+                msg = "Are you sure you want to Pause the subscription?";
+                break;
+            default:
+                msg = "Are you sure you want to Cancel the subscription?";
+                break;
+            }
         Alert.alert(
             "Confirm",
             msg,
