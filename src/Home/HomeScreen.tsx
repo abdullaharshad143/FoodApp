@@ -42,22 +42,22 @@ const HomeScreen = ({
 
             if (userDocSnapShot.exists()) {
                 const { status } = userDocSnapShot.data();
-                if (status === "ACTIVE" || status === "SCHEDULED" || status === "PAUSE") {
-                    let orderedItems: IProduce[] = []; // Initialize orderedItems array
+                // Initialize orderedItems array
+                let orderedItems: IProduce[] = [];
 
-                    if (status === "ACTIVE" || status === "PAUSE") {
-                        const oneTimeRef = collection(db, "subscription");
-                        const snapshot = await getDocs(oneTimeRef);
-                        orderedItems = snapshot.docs
-                            .map(doc => doc.data().orderedItems)
-                            .flat();
-                    } else if (status === "SCHEDULED") {
-                        const subscriptionRef = collection(db, "oneTime");
-                        const snapshot = await getDocs(subscriptionRef);
-                        orderedItems = snapshot.docs
-                            .map(doc => doc.data().orderedItems)
-                            .flat();
-                    }
+                if (status === "ACTIVE" || status === "PAUSE") {
+                    const oneTimeRef = collection(db, "subscription");
+                    const snapshot = await getDocs(oneTimeRef);
+                }
+                else if (status === "SCHEDULED") {
+                    const subscriptionRef = collection(db, "oneTime");
+                    const snapshot = await getDocs(subscriptionRef);
+                }
+
+                orderedItems = snapshot.docs
+                        .map(doc => doc.data().orderedItems)
+                        .flat();
+                
                     dispatch(
                         setUser({
                             status: status
