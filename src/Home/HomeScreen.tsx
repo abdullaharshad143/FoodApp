@@ -37,49 +37,44 @@ const HomeScreen = ({
         setLoading(true)
         try {
             const userId = await AsyncStorage.getItem('userId');
-            const userDocRef = doc(db, "users", userId || "");
+            if (!userId) {
+                throw new Error("User ID not found in AsyncStorage");
+            }
+    
+            const userDocRef = doc(db, "users", userId);
             const userDocSnapShot = await getDoc(userDocRef);
-
+    
             if (userDocSnapShot.exists()) {
-                const { status } = userDocSnapShot.data();
-                // Initialize orderedItems array
+                const { status } = userDocSnapShot.data() as { status: string };
                 let orderedItems: IProduce[] = [];
-
+    
                 if (status === "ACTIVE" || status === "PAUSE") {
-                    const oneTimeRef = collection(db, "subscription");
-                    const snapshot = await getDocs(oneTimeRef);
-                }
-                else if (status === "SCHEDULED") {
-                    const subscriptionRef = collection(db, "oneTime");
-                    const snapshot = await getDocs(subscriptionRef);
-                }
-
-                orderedItems = snapshot.docs
-                        .map(doc => doc.data().orderedItems)
+                    const SubscriptionRef = collection(db, "subscription"); // Changed to correct collection for oneTime items
+                    const snapshot = await getDocs(SubscriptionRef);
+    
+                    orderedItems = snapshot.docs
+                        .map(doc => doc.data().orderedItems as IProduce[])
                         .flat();
-                
-                    dispatch(
-                        setUser({
-                            status: status
-                        })
-                    )
-                    //@ts-ignore
-                    dispatch(setItems(orderedItems));
+                } else if (status === "SCHEDULED") {
+                    const OneTimeRef = collection(db, "OneTime"); // Changed to correct collection for subscription items
+                    const snapshot = await getDocs(OneTimeRef);
+    
+                    orderedItems = snapshot.docs
+                        .map(doc => doc.data().orderedItems as IProduce[])
+                        .flat();
                 }
-                if (!status) {
-                    dispatch(
-                        setUser({
-                            status: ""
-                        })
-                    )
-                }
+    
+                dispatch(setUser({ status }));
+                //@ts-ignore
+                dispatch(setItems(orderedItems));
+            } else {
+                dispatch(setUser({ status: "" }));
             }
         } catch (error) {
             console.error("Error getting user document:", error);
             // Handle error as needed
-        }
-        finally {
-            setLoading(false)
+        } finally {
+            setLoading(false);
         }
     };
 
