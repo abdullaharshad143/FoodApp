@@ -1,205 +1,173 @@
-import { Text, View, StyleSheet, FlatList, ScrollView, Image, TextInput, TouchableOpacity, ActivityIndicator } from "react-native"
-import { useCallback, useEffect, useState } from "react"
-import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive"
-import { Colors } from "../theme/color"
-import SearchComponent from "../components/SearchComponent"
-import FoodCard from "../components/FoodCard"
-import Fonts from "../theme/typographic"
-import { IProduce, RootBottomParamList, RootStackParamList } from "../core/types"
-import FloatingButton from "../components/FloatingButton"
-import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import React from "react"
-import Header from "../components/Header"
-import SmallButton from "../components/SmallButton"
-import { useDispatch, useSelector } from "react-redux"
-import { RootState } from "../redux/store"
-import Button from "../components/Button"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { collection, doc, setDoc, updateDoc } from "firebase/firestore"
-import { db } from "../../config/firebase"
-import { setUser } from "../redux/users/userSlices"
-import { UseDispatch } from "react-redux"
+import React, { useCallback, useEffect, useState } from "react";
+import { Text, View, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
 
+import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive";
+import { Colors } from "../theme/color";
+import Fonts from "../theme/typographic";
+import { RootBottomParamList } from "../core/types";
+import Header from "../components/Header";
+import Button from "../components/Button";
+import { db } from "../../config/firebase";
+import { setUser } from "../redux/users/userSlices";
+import { RootState } from "../redux/store";
 
-const SubscribeAndSaveScreen = ({
-    navigation,
-}: NativeStackScreenProps<RootBottomParamList>) => {
-    const [selectSubscription, setSelectSubscription] = useState(true)
-    const [selectOneTime, setSelectOneTime] = useState(false)
-    const [weeklyFrequency, setWeeklyFrequency] = useState(true)
-    const [twoWeeksFrequency, setTwoWeeksFrequency] = useState(false)
-    const [threeWeeksFrequency, setThreeWeeksFrequency] = useState(false)
-    const [fourWeeksFrequency, setfourWeeksFrequency] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const dispatch = useDispatch()
+const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBottomParamList>) => {
+    const [selectSubscription, setSelectSubscription] = useState(true);
+    const [selectOneTime, setSelectOneTime] = useState(false);
+    const [frequency, setFrequency] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
     const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
     const cartItems = useSelector((state: RootState) => state.produce.items);
-    // console.log(cartItems)
-    let priceWithDelivery = 150
-    if (totalPrice) {
-        priceWithDelivery += totalPrice
-    }
-    const oneTimePrice = priceWithDelivery + 200
+
+    const priceWithDelivery = totalPrice ? totalPrice + 150 : 150;
+    const oneTimePrice = priceWithDelivery + 200;
+
     const subscriptionSelection = useCallback(() => {
-        setWeeklyFrequency(true)
-        setSelectOneTime(false)
-        setSelectSubscription(true)
-    }, [])
+        setFrequency(1);
+        setSelectOneTime(false);
+        setSelectSubscription(true);
+    }, []);
+
     const oneTimeSelection = useCallback(() => {
-        setSelectSubscription(false)
-        setSelectOneTime(true)
-        setWeeklyFrequency(false)
-        setTwoWeeksFrequency(false)
-        setThreeWeeksFrequency(false)
-        setfourWeeksFrequency(false)
-    }, [])
-    const weeklyFrequencySelection = useCallback(() => {
-        setWeeklyFrequency(true)
-        setTwoWeeksFrequency(false)
-        setThreeWeeksFrequency(false)
-        setfourWeeksFrequency(false)
-    }, [])
-    const twoWeeksFrequencySelection = useCallback(() => {
-        setWeeklyFrequency(false)
-        setTwoWeeksFrequency(true)
-        setThreeWeeksFrequency(false)
-        setfourWeeksFrequency(false)
-    }, [])
-    const threeWeeksFrequencySelection = useCallback(() => {
-        setWeeklyFrequency(false)
-        setTwoWeeksFrequency(false)
-        setThreeWeeksFrequency(true)
-        setfourWeeksFrequency(false)
-    }, [])
-    const fourWeeksFrequencySelection = useCallback(() => {
-        setWeeklyFrequency(false)
-        setTwoWeeksFrequency(false)
-        setThreeWeeksFrequency(false)
-        setfourWeeksFrequency(true)
-    }, [])
+        setSelectSubscription(false);
+        setSelectOneTime(true);
+        setFrequency(0);
+    }, []);
+
+    const handleFrequencySelection = (selectedFrequency: number) => {
+        setFrequency(selectedFrequency);
+    };
+
     const handleCheckout = useCallback(async () => {
-        setLoading(true)
-        const userId = await AsyncStorage.getItem('userId')
+        setLoading(true);
+        const userId = await AsyncStorage.getItem('userId');
         const orderData = {
             userId,
             orderedItems: cartItems,
             totalPrice: selectOneTime ? oneTimePrice : priceWithDelivery,
             status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
-            frequency: weeklyFrequency ? 1 : twoWeeksFrequency ? 2 : threeWeeksFrequency ? 3 : fourWeeksFrequency ? 4 : null,
-            orderdate: new Date().toISOString()
-        }
+            frequency: selectOneTime ? null : frequency,
+            orderDate: new Date().toISOString(),
+        };
 
         try {
-            if (selectOneTime) {
-                const oneTimeDocRef = doc(collection(db, "oneTime"));
-                await setDoc(oneTimeDocRef, orderData);
-                const userDocRef = doc(db, "users", userId || "");
-                await updateDoc(userDocRef, {
-                    orderCollectionId: oneTimeDocRef.id,
-                });
-            } else {
-                const subscriptionDocRef = doc(collection(db, "subscription"));
-                await setDoc(subscriptionDocRef, orderData);
-                const userDocRef = doc(db, "users", userId || "");
-                await updateDoc(userDocRef, {
-                    orderId: subscriptionDocRef.id,
-                });
-            }
+            const collectionName = selectOneTime ? "oneTime" : "subscription";
+            const docRef = doc(collection(db, collectionName));
+            await setDoc(docRef, orderData);
             const userDocRef = doc(db, "users", userId || "");
             await updateDoc(userDocRef, {
+                orderId: docRef.id,
                 status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
                 orderType: selectOneTime ? 'One Time' : 'Subscription',
             });
-            dispatch(
-                setUser({
-                    status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
-                })
-            )
-            navigation.navigate("ScheduledScreen")
+            dispatch(setUser({ status: selectOneTime ? 'SCHEDULED' : 'ACTIVE' }));
+            navigation.navigate("ScheduledScreen");
         } catch (error) {
-            console.error("Error adding document: ", error)
+            console.error("Error adding document: ", error);
+        } finally {
+            setLoading(false);
         }
-        finally {
-            setLoading(false)
-        }
-    }, [selectOneTime, cartItems, totalPrice, navigation])
-    useEffect(() => {
-        console.log("Inside Subscribe and Save Screen")
-    }, [])
+    }, [selectOneTime, cartItems, totalPrice, navigation, frequency]);
 
+    useEffect(() => {
+        console.log("Inside Subscribe and Save Screen");
+    }, []);
 
     return (
         <View style={styles.mainContainer}>
             <Header text="Subscribe & Save" top={40} />
-            <View style={{ padding: 20 }}>
-                <TouchableOpacity style={[styles.subscriptionContainer, { borderColor: selectSubscription ? Colors.lightOrange : 'black' }]} onPress={subscriptionSelection}>
+            <View style={{ padding: 20, marginTop: 50 }}>
+                <TouchableOpacity
+                    style={[styles.selectionContainer, { borderColor: selectSubscription ? Colors.lightOrange : 'black' }]}
+                    onPress={subscriptionSelection}
+                >
                     <View style={styles.flexRowStyle}>
-                        <Text style={styles.subscriptionText}>{"Subscription"}</Text>
+                        <Text style={styles.selectionText}>{"Subscription"}</Text>
                         <Text style={styles.lightText}>Rs {priceWithDelivery}</Text>
                     </View>
-                    <View style={[styles.flexRowStyle, { justifyContent: "flex-start" }]}>
-                        <TouchableOpacity disabled={selectSubscription ? false : true} style={[styles.buttonContainer, { backgroundColor: weeklyFrequency ? Colors.lightOrange : "white" }]} onPress={weeklyFrequencySelection}>
-                            <Text style={styles.buttonText}>{"Weekly"}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity disabled={selectSubscription ? false : true} style={[styles.buttonContainer, { marginHorizontal: 40, backgroundColor: twoWeeksFrequency ? Colors.lightOrange : "white" }]} onPress={twoWeeksFrequencySelection}>
-                            <Text style={styles.buttonText}>{"  2 Weeks"}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={[styles.flexRowStyle, { justifyContent: 'flex-start' }]}>
-                        <TouchableOpacity disabled={selectSubscription ? false : true} style={[styles.buttonContainer, { backgroundColor: threeWeeksFrequency ? Colors.lightOrange : "white" }]} onPress={threeWeeksFrequencySelection}>
-                            <Text style={styles.buttonText}>{"3 Weeks"}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity disabled={selectSubscription ? false : true} style={[styles.buttonContainer, { marginHorizontal: 40, backgroundColor: fourWeeksFrequency ? Colors.lightOrange : "white" }]} onPress={fourWeeksFrequencySelection}>
-                            <Text style={styles.buttonText}>{"Monthly"}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={styles.infoPoints}>{"• Easily pause and cancel"}</Text>
-                    <Text style={styles.infoPoints}>{"• Save Rs 200 on each order"}</Text>
-                    <Text style={styles.infoPoints}>{"• Previous box copied to next week"}</Text>
-                    <Text style={styles.infoPoints}>{"• Set and forget or edit each week"}</Text>
+                    {selectSubscription && (
+                        <View>
+                            <View style={[styles.flexRowStyle, { justifyContent: "flex-start" }]}>
+                                <TouchableOpacity
+                                    style={[styles.buttonContainer, { backgroundColor: frequency === 1 ? Colors.lightOrange : "white" }]}
+                                    onPress={() => handleFrequencySelection(1)}
+                                >
+                                    <Text style={styles.buttonText}>{"Weekly"}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.buttonContainer, { marginHorizontal: 40, backgroundColor: frequency === 2 ? Colors.lightOrange : "white" }]}
+                                    onPress={() => handleFrequencySelection(2)}
+                                >
+                                    <Text style={styles.buttonText}>{"2 Weeks"}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={[styles.flexRowStyle, { justifyContent: 'flex-start' }]}>
+                                <TouchableOpacity
+                                    style={[styles.buttonContainer, { backgroundColor: frequency === 3 ? Colors.lightOrange : "white" }]}
+                                    onPress={() => handleFrequencySelection(3)}
+                                >
+                                    <Text style={styles.buttonText}>{"3 Weeks"}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.buttonContainer, { marginHorizontal: 40, backgroundColor: frequency === 4 ? Colors.lightOrange : "white" }]}
+                                    onPress={() => handleFrequencySelection(4)}
+                                >
+                                    <Text style={styles.buttonText}>{"Monthly"}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.infoPoints}>{"• Easily pause and cancel"}</Text>
+                            <Text style={styles.infoPoints}>{"• Save Rs 200 on each order"}</Text>
+                            <Text style={styles.infoPoints}>{"• Previous box copied to next week"}</Text>
+                            <Text style={styles.infoPoints}>{"• Set and forget or edit each week"}</Text>
+                        </View>
+                    )}
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.oneTimeContainer, { borderColor: selectOneTime ? Colors.lightOrange : 'black' }]} onPress={oneTimeSelection}>
+                <TouchableOpacity
+                    style={[styles.selectionContainer, { borderColor: selectOneTime ? Colors.lightOrange : 'black' }]}
+                    onPress={oneTimeSelection}
+                >
                     <View style={styles.flexRowStyle}>
-                        <Text style={styles.subscriptionText}>{"One Time Purchase"}</Text>
+                        <Text style={styles.selectionText}>{"One Time Purchase"}</Text>
                         <Text style={styles.lightText}>Rs {oneTimePrice}</Text>
                     </View>
                 </TouchableOpacity>
             </View>
             <View>
-                <Text style={styles.saveText}>{"*You can subscriibe and easily pause all future orders and save Rs 200"}</Text>
+                <Text style={styles.saveText}>{"*You can subscribe and easily pause all future orders and save Rs 200"}</Text>
             </View>
             <View style={styles.checkoutButton}>
                 {loading ? (
-                    <>
-                        <ActivityIndicator size={"large"} color={Colors.lightOrange} />
-                    </>
+                    <ActivityIndicator size={"large"} color={Colors.lightOrange} />
                 ) : (
                     <Button title={selectSubscription ? `Checkout Rs ${priceWithDelivery}` : `Checkout Rs ${oneTimePrice}`} onPress={handleCheckout} />
                 )}
             </View>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         backgroundColor: "white"
     },
-    subscriptionContainer: {
+    selectionContainer: {
         borderWidth: 1,
-        marginTop: verticalScale(100),
+        marginTop: verticalScale(20),
         paddingHorizontal: horizontalScale(20),
         paddingVertical: verticalScale(20),
         borderRadius: 10,
-        // borderColor: 'black'
     },
     flexRowStyle: {
         flexDirection: "row",
         justifyContent: 'space-between',
-        // marginHorizontal: 20
     },
-    subscriptionText: {
+    selectionText: {
         fontFamily: Fonts.Family.Bold,
         fontSize: moderateScale(20)
     },
@@ -213,7 +181,6 @@ const styles = StyleSheet.create({
         textAlignVertical: 'center'
     },
     buttonContainer: {
-        // backgroundColor: Colors.lightOrange,
         padding: 10,
         width: horizontalScale(90),
         marginVertical: verticalScale(10),
@@ -227,14 +194,6 @@ const styles = StyleSheet.create({
         fontSize: moderateScale(16),
         marginVertical: verticalScale(8)
     },
-    oneTimeContainer: {
-        borderWidth: 1,
-        paddingHorizontal: horizontalScale(20),
-        paddingVertical: verticalScale(20),
-        borderRadius: 10,
-        // borderColor: Colors.lightOrange,
-        marginTop: verticalScale(20)
-    },
     saveText: {
         fontFamily: Fonts.Family.MediumItalic,
         color: Colors.slateGrey,
@@ -246,4 +205,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SubscribeAndSaveScreen
+export default SubscribeAndSaveScreen;
