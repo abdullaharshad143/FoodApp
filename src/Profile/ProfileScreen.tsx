@@ -13,8 +13,10 @@ import { useCallback, useEffect, useState } from "react";
 import { clearUser, clearAddress, setUser } from "../redux/users/userSlices";
 import { StackActions } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import { deleteUser, getAuth } from "firebase/auth";
+import { clearCart } from "../redux/cart/cartSlices";
 const ProfileScreen = ({
     navigation
 }: NativeStackScreenProps<RootStackParamList>) => {
@@ -29,6 +31,7 @@ const ProfileScreen = ({
         setLoading(true);
         dispatch(clearUser());
         dispatch(clearAddress());
+        dispatch(clearCart());
         await AsyncStorage.clear()
         navigation.dispatch(StackActions.replace("AuthStack"))
         setLoading(false);
@@ -46,7 +49,7 @@ const ProfileScreen = ({
             default:
                 msg = "Are you sure you want to Cancel the subscription?";
                 break;
-            }
+        }
         Alert.alert(
             "Confirm",
             msg,
@@ -95,19 +98,6 @@ const ProfileScreen = ({
                                 alert("Subscription Updated!");
                                 console.log(`Subscription status updated to ${status}`);
                             }
-                            // } else {
-                            //     const oneTimeDocRef = doc(db, "oneTime", orderId);
-                            //     const oneTimeDoc = await getDoc(oneTimeDocRef);
-
-                            //     if (oneTimeDoc.exists()) {
-                            //         await updateDoc(oneTimeDocRef, {
-                            //             status: status,
-                            //         });
-                            //         console.log(`One-time order status updated to ${status}`);
-                            //     } else {
-                            //         console.error("Order ID not found in subscription or one-time collections");
-                            //     }
-                            // }
                         } else {
                             console.error("User document not found");
                         }
@@ -116,6 +106,72 @@ const ProfileScreen = ({
             ]
         );
     }, []);
+
+    const deleteAccount = useCallback(async () => {
+        Alert.alert(
+            "Confirm Delete Account",
+            "Are you sure you want to delete your account? This action cannot be undone.",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Delete cancelled"),
+                    style: "cancel"
+                },
+                {
+                    text: "Yes",
+                    onPress: async () => {
+                        setLoading(true);
+                        const userId = await AsyncStorage.getItem('userId');
+                        if (!userId) {
+                            console.error("User ID not found");
+                            setLoading(false);
+                            return;
+                        }
+
+                        try {
+                            const userDocRef = doc(db, "users", userId);
+                            const userDoc = await getDoc(userDocRef);
+
+                            if (userDoc.exists()) {
+                                const userData = userDoc.data();
+                                const orderId = userData.orderId;
+
+                                if (orderId) {
+                                    if (userData.status === "SCHEDULED") {
+                                        const oneTimeDocRef = doc(db, "oneTime", orderId);
+                                        await deleteDoc(oneTimeDocRef);
+                                    } else if (userData.status === "ACTIVE") {
+                                        const subscriptionDocRef = doc(db, "subscription", orderId);
+                                        await deleteDoc(subscriptionDocRef);
+                                    }
+                                }
+
+                                await deleteDoc(userDocRef);
+
+                                const auth = getAuth();
+                                const user = auth.currentUser;
+                                if (user) {
+                                    await deleteUser(user);
+                                }
+
+                                await AsyncStorage.clear();
+                                dispatch(clearUser());
+                                dispatch(clearAddress());
+                                alert("Account Deleted!");
+                                navigation.dispatch(StackActions.replace("AuthStack"));
+                            } else {
+                                console.error("User document not found");
+                            }
+                        } catch (error) {
+                            console.error("Error deleting account: ", error);
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                }
+            ]
+        );
+    }, [dispatch, navigation]);
 
     return (
         <ScrollView style={styles.mainContainer}>
@@ -212,7 +268,7 @@ const ProfileScreen = ({
                         <SmallButton title="Cancel Subscription" onPress={() => updateSubscriptionStatus("CANCELLED")} />
                     )}
                     <SmallButton title="Logout" loading={loading} onPress={logout()} />
-                    <SmallButton title="Delete Account" />
+                    <SmallButton title="Delete Account" onPress={deleteAccount} />
                 </View>
             )}
         </ScrollView>
