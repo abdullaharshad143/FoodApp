@@ -5,14 +5,22 @@ import { horizontalScale, moderateScale, verticalScale } from "../utils/responsi
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc } from "firebase/firestore";
+import { Timestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { format, addDays, differenceInDays, nextTuesday, nextSaturday, isAfter } from "date-fns";
 
+interface OrderData {
+    status: string;
+    orderId: string;
+    deliveryDate?: Timestamp;
+    frequency?: number;
+    totalPrice?: number;
+}
+
 const UpcomingOrders = () => {
     const [loading, setLoading] = useState(false);
-    const [orderData, setOrderData] = useState<any>(null);
-    const [nextOrders, setNextOrders] = useState<any[]>([]);
+    const [orderData, setOrderData] = useState<OrderData | null>(null);
+    const [nextOrder, setNextOrder] = useState<any>(null); // Changed to singular for one-time orders
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -34,7 +42,11 @@ const UpcomingOrders = () => {
                 throw new Error("User document not found");
             }
 
-            const userData = userDocSnapShot.data() as { status: string, orderId: string };
+            const userData = userDocSnapShot.data() as OrderData | undefined;
+            if (!userData) {
+                throw new Error("User data is undefined");
+            }
+
             const { status, orderId } = userData;
 
             let collectionName: string;
@@ -53,12 +65,40 @@ const UpcomingOrders = () => {
             }
 
             const orderData = orderDocSnapShot.data();
-            setOrderData(orderData);
+            setOrderData(orderData as OrderData);
 
-            const frequency = orderData.frequency;
-
-            const nextOrders = generateNextOrders(frequency);
-            setNextOrders(nextOrders);
+            if (status === "SCHEDULED") {
+                let deliveryDate: string | undefined = "Date not available";
+                let daysUntilDelivery: number | string = "N/A";
+                let billingDate: string | undefined = "Date not available";
+                let daysUntilBilling: number | string = "N/A";
+            
+                const today = new Date();
+                let nextTuesdayDate = nextTuesday(today);
+                const nextSaturdayDate = nextSaturday(today);
+            
+                if (isAfter(nextSaturdayDate, nextTuesdayDate)) {
+                    nextTuesdayDate = addDays(nextTuesdayDate, 7);
+                }
+            
+                daysUntilBilling = differenceInDays(nextSaturdayDate, today);
+                daysUntilDelivery = differenceInDays(nextTuesdayDate, today);
+            
+                billingDate = format(nextSaturdayDate, 'PPPP');
+                deliveryDate = format(nextTuesdayDate, 'PPPP');
+            
+                setNextOrder({
+                    deliveryDate,
+                    daysUntilDelivery,
+                    billingDate,
+                    daysUntilBilling,
+                });
+            }            
+             else {
+                const frequency = orderData.frequency;
+                const nextOrders = generateNextOrders(frequency);
+                setNextOrder(nextOrders);
+            }
         } catch (error) {
             console.error("Error in getUserAndOrder:", error);
         } finally {
@@ -92,15 +132,14 @@ const UpcomingOrders = () => {
         return nextOrders;
     };
 
-    //@ts-ignore
-    const renderOrderItem = ({ item }) => (
+    const renderOrderItem = ({ item }: { item: any }) => (
         <View style={[styles.orderItemContainer, orderData?.status === "PAUSE" ? styles.disabledOrder : null]}>
             <View style={styles.iconContainer}>
                 <Icon name="calendar" size={24} color={orderData?.status === "PAUSE" ? '#ccc' : '#000000'} />
             </View>
             <View style={styles.orderDetails}>
-            <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Billing: {item.billingDate} (in {item.daysUntilBilling} days)</Text>
-            <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Delivery: {item.deliveryDate} (in {item.daysUntilDelivery} days)</Text>
+                        <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Billing: {item.billingDate} (in {item.daysUntilBilling} days)</Text>
+                        <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Delivery: {item.deliveryDate} (in {item.daysUntilDelivery} days)</Text>
             </View>
         </View>
     );
@@ -117,15 +156,13 @@ const UpcomingOrders = () => {
                             <Text style={styles.headerText}>Upcoming Orders</Text>
                         </View>
                         <Text style={styles.totalPriceText}>Total Price: {orderData.totalPrice} Rs</Text>
-                        <View style={{padding:10}}>
                         <FlatList
-                            data={nextOrders}
+                            data={orderData.status === "SCHEDULED" ? [nextOrder] : nextOrder} // Render single order if status is SCHEDULED
                             renderItem={renderOrderItem}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={styles.orderList}
                             showsVerticalScrollIndicator={false}
                         />
-                            </View>
                     </View>
                 ) : (
                     <View style={styles.emptyContainer}>

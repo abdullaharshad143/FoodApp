@@ -14,6 +14,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../../config/firebase";
 import { Firestore, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { StackActions } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AddressInfoScreen = ({
     navigation,
@@ -90,6 +91,7 @@ const AddressInfoScreen = ({
                     })
                 )
                 // Alert.alert("User signedUp Successfully!");
+                await AsyncStorage.setItem('userId', user.uid)
                 navigation.dispatch(StackActions.replace('HomeStack'))
             }
         } catch (e) {
