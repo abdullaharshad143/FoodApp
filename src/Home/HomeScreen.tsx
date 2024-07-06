@@ -40,30 +40,34 @@ const HomeScreen = ({
             if (!userId) {
                 throw new Error("User ID not found in AsyncStorage");
             }
-    
+
             const userDocRef = doc(db, "users", userId);
             const userDocSnapShot = await getDoc(userDocRef);
-    
+
             if (userDocSnapShot.exists()) {
                 const { status } = userDocSnapShot.data() as { status: string };
                 let orderedItems: IProduce[] = [];
-    
-                if (status === "ACTIVE" || status === "PAUSE") {
-                    const SubscriptionRef = collection(db, "subscription"); // Changed to correct collection for oneTime items
-                    const snapshot = await getDocs(SubscriptionRef);
-    
-                    orderedItems = snapshot.docs
-                        .map(doc => doc.data().orderedItems as IProduce[])
-                        .flat();
-                } else if (status === "SCHEDULED") {
-                    const OneTimeRef = collection(db, "OneTime"); // Changed to correct collection for subscription items
-                    const snapshot = await getDocs(OneTimeRef);
-    
-                    orderedItems = snapshot.docs
-                        .map(doc => doc.data().orderedItems as IProduce[])
-                        .flat();
+
+                if (userDocSnapShot.exists()) {
+                    const { status, orderId } = userDocSnapShot.data() as { status: string; orderId: string };
+
+                    if (status === "ACTIVE" || status === "PAUSE") {
+                        const subscriptionDocRef = doc(db, "subscription", orderId);
+                        const subscriptionDoc = await getDoc(subscriptionDocRef);
+
+                        if (subscriptionDoc.exists()) {
+                            orderedItems = subscriptionDoc.data().orderedItems as IProduce[];
+                        }
+                    } else if (status === "SCHEDULED") {
+                        const oneTimeDocRef = doc(db, "oneTime", orderId);
+                        const oneTimeDoc = await getDoc(oneTimeDocRef);
+
+                        if (oneTimeDoc.exists()) {
+                            orderedItems = oneTimeDoc.data().orderedItems as IProduce[];
+                        }
+                    }
                 }
-    
+
                 dispatch(setUser({ status }));
                 //@ts-ignore
                 dispatch(setItems(orderedItems));
