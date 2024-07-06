@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Text, View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from "react-native";
 import Fonts from "../theme/typographic";
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive";
 import { FontAwesome as Icon } from "@expo/vector-icons";
@@ -20,7 +20,8 @@ interface OrderData {
 const UpcomingOrders = () => {
     const [loading, setLoading] = useState(false);
     const [orderData, setOrderData] = useState<OrderData | null>(null);
-    const [nextOrder, setNextOrder] = useState<any>(null); // Changed to singular for one-time orders
+    const [nextOrder, setNextOrder] = useState<any>(null);
+    const [refreshing, setRefreshing] = useState(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -50,7 +51,7 @@ const UpcomingOrders = () => {
             const { status, orderId } = userData;
 
             let collectionName: string;
-            if (status === "ACTIVE") {
+            if (status === "ACTIVE" || "PAUSE") {
                 collectionName = "subscription";
             } else if (status === "SCHEDULED") {
                 collectionName = "oneTime";
@@ -103,6 +104,7 @@ const UpcomingOrders = () => {
             console.error("Error in getUserAndOrder:", error);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -131,6 +133,10 @@ const UpcomingOrders = () => {
 
         return nextOrders;
     };
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        getUserAndOrder();
+    }, []);
 
     const renderOrderItem = ({ item }: { item: any }) => (
         <View style={[styles.orderItemContainer, orderData?.status === "PAUSE" ? styles.disabledOrder : null]}>
@@ -162,6 +168,9 @@ const UpcomingOrders = () => {
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={styles.orderList}
                             showsVerticalScrollIndicator={false}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                            }
                         />
                     </View>
                 ) : (

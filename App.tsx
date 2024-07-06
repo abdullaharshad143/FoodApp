@@ -53,19 +53,14 @@ export default function App() {
     }
     gotoLogin()
   }, [])
-  if (!isNavigationReady) {
+  const persistor = persistStore(store)
+  console.log(isNavigationRead1y);
+  if (!isNavigationReady || !fontsLoaded) {
     return (
-      <View style={{justifyContent:'center', alignSelf:'center'}}>
+      <View style={{justifyContent:'center', alignContent:'center', flex:1}}>
         <ActivityIndicator size="large" color="#FFD08A" />
       </View>
     );
-  }
-  const persistor = persistStore(store)
-  console.log(isNavigationRead1y);
-  if (!fontsLoaded) {
-    <View style={{justifyContent:'center', alignSelf:'center'}}>
-        <ActivityIndicator size="large" color="#FFD08A" />
-      </View>
   }
   else {
     return (
