@@ -14,6 +14,7 @@ const PaymentDetails = () => {
     const tuesdayDate = getNextDayOfWeek(2);
     const saturdayFormattedDate = formatDate(saturdaydate)
     const tuesdayFormattedDate = formatDate(tuesdayDate)
+    const paymentSuccess = useSelector((state: any) => state.payment.paymentSuccess);
     let priceWithDelivery = 150
     if(totalPrice){
         priceWithDelivery += totalPrice
@@ -38,8 +39,13 @@ const PaymentDetails = () => {
                         <Icon name="credit-card" size={30} color={'black'} style={styles.iconStyle} />
                     </View>
                     <View>
-                        <Text style={[styles.textStyle, styles.margin]}>{`Billing on ${saturdayFormattedDate}`}</Text>
-                        <Text style={[styles.lightTextStyle, styles.margin]}>{'At cut-off 11:59 pm'}</Text>
+                        {!paymentSuccess ? (
+                            <Text style={[styles.textStyle, styles.margin]}>{`You can bill any time before ${saturdayFormattedDate}`}</Text>
+                            /* <Text style={[styles.lightTextStyle, styles.margin]}>{'At cut-off 11:59 pm'}</Text> */
+                        ) : (
+                            <Text style={[styles.textStyle, styles.margin, {marginTop:7}]}>{`Billing is done!`}</Text>
+                            /* <Text style={[styles.lightTextStyle, styles.margin]}>{'At cut-off 11:59 pm'}</Text> */
+                        )}
                     </View>
                 </View>
                 <View style={styles.flex}>

@@ -14,6 +14,7 @@ import Button from "../components/Button";
 import { db } from "../../config/firebase";
 import { setUser } from "../redux/users/userSlices";
 import { RootState } from "../redux/store";
+import { format, nextSaturday } from "date-fns";
 
 const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBottomParamList>) => {
     const [selectSubscription, setSelectSubscription] = useState(true);
@@ -53,6 +54,7 @@ const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBotto
             status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
             frequency: selectOneTime ? null : frequency,
             orderDate: new Date().toISOString(),
+            nextPaymentDate: format(nextSaturday(new Date()), 'yyyy-MM-dd')
         };
 
         try {

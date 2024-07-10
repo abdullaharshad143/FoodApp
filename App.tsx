@@ -14,6 +14,7 @@ import { auth } from './config/firebase';
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 import Constants from 'expo-constants';
+import { StripeProvider } from '@stripe/stripe-react-native';
   
 
 export default function App() {
@@ -64,19 +65,21 @@ export default function App() {
   }
   else {
     return (
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <NavigationContainer>
-            <Stack.Navigator
-              screenOptions={{ headerShown: false }}
-              initialRouteName={isNavigationRead1y}
-            >
-              <Stack.Screen name="HomeStack" component={HomeStack} />
-              <Stack.Screen name="AuthStack" component={AuthStack} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </PersistGate>
-      </Provider>
+      <StripeProvider publishableKey={process.env.publishableKey || ""}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <NavigationContainer>
+              <Stack.Navigator
+                screenOptions={{ headerShown: false }}
+                initialRouteName={isNavigationRead1y}
+              >
+                <Stack.Screen name="HomeStack" component={HomeStack} />
+                <Stack.Screen name="AuthStack" component={AuthStack} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </PersistGate>
+        </Provider>
+      </StripeProvider>
     );
   }
 }
