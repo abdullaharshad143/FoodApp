@@ -15,24 +15,27 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { db } from "../../config/firebase"
 import { setItems } from "../redux/cart/cartSlices"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setUser } from "../redux/users/userSlices"
 import { useFocusEffect } from "@react-navigation/native"
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import { setPaymentSuccess } from "../redux/orders/paymentSlices"
 
 const HomeScreen = ({
     navigation,
 }: NativeStackScreenProps<RootBottomParamList>) => {
     const [loading, setLoading] = useState(false)
+    const paymentSuccess = useSelector((state: any) => state.payment.paymentSuccess);
+    console.log("paymentSuccess: ", paymentSuccess)
     const dispatch = useDispatch();
     useEffect(() => {
         console.log("Inside Home Screen")
     }, [])
-    useFocusEffect(
-        useCallback(() => {
-            getUser();
-        }, [])
-    );
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         getUser();
+    //     }, [])
+    // );
     const getUser = async () => {
         setLoading(true)
         try {
@@ -57,6 +60,7 @@ const HomeScreen = ({
 
                         if (subscriptionDoc.exists()) {
                             orderedItems = subscriptionDoc.data().orderedItems as IProduce[];
+                            dispatch(setPaymentSuccess(subscriptionDoc.data().paymentSuccess))
                         }
                     } else if (status === "SCHEDULED") {
                         const oneTimeDocRef = doc(db, "oneTime", orderId);
@@ -64,6 +68,7 @@ const HomeScreen = ({
 
                         if (oneTimeDoc.exists()) {
                             orderedItems = oneTimeDoc.data().orderedItems as IProduce[];
+                            dispatch(setPaymentSuccess(oneTimeDoc.data().paymentSuccess))
                         }
                     }
                 }
@@ -125,6 +130,16 @@ const HomeScreen = ({
         <>
             <SafeAreaView style={styles.mainContainer}>
                 <ScrollView style={styles.scrollView}>
+                    {!paymentSuccess &&
+                        <TouchableOpacity
+                            style={styles.banner}
+                            onPress={() => navigation.navigate('ScheduledScreen')}
+                        >
+                            <Text style={styles.bannerText}>
+                                Pending Payment: Complete your payment before Saturday to avoid cancellation of your order or subscription. Click here to pay now.
+                            </Text>
+                        </TouchableOpacity>
+                    }
                     <TouchableOpacity onPress={() => navigation.navigate("SearchScreen")} style={styles.searchContainer}>
                         <Icon style={{ marginHorizontal: 10 }} name="search" size={25} color={Colors.lightGrey} />
                         <Text style={styles.textStyle}>{"Search"}</Text>
@@ -133,7 +148,7 @@ const HomeScreen = ({
                     {renderCategory('Vegetable')}
                     {renderCategory('Dairy')}
                     {renderCategory('Meat & Poultry')}
-                    {renderCategory('Seafood')}
+                    {renderCategory('Condiments')}
                     {renderCategory('Grains')}
                     {renderCategory('Beverages')}
                     {renderCategory('Snacks')}
@@ -195,7 +210,21 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.Family.SemiBold,
         textAlignVertical: 'center',
         color: 'grey'
-    }
+    },
+    banner: {
+        backgroundColor: "orange", // Warning color
+        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '85%',
+        alignSelf: 'center',
+        borderRadius: 15
+    },
+    bannerText: {
+        color: '#000',
+        fontFamily: Fonts.Family.Bold,
+        textAlign: 'center'
+    },
 });
 
 export default HomeScreen

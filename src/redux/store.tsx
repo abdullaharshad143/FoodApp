@@ -4,6 +4,7 @@ import { UserInfo, userReducer } from "./users/userSlices";
 import { produceReducer } from "./cart/cartSlices";
 import { IProduce } from "../core/types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { paymentReducer } from "./orders/paymentSlices";
 
 export interface RootState {
   user: UserInfo
@@ -18,6 +19,7 @@ const store = configureStore({
   reducer: {
     user: persistedUserReducer,
     produce: produceReducer,
+    payment: paymentReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

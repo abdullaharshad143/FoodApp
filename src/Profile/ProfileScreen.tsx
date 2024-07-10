@@ -217,7 +217,7 @@ const ProfileScreen = ({
 
             </View>
 
-            <View style={[styles.headingContainer, { marginTop: verticalScale(30) }]}>
+            {/* <View style={[styles.headingContainer, { marginTop: verticalScale(30) }]}>
                 <Text style={styles.headingStyle}>{"Payment Card"}</Text>
             </View>
             <View style={styles.flexStyle}>
@@ -235,7 +235,7 @@ const ProfileScreen = ({
                     </TouchableOpacity>
                 </View>
 
-            </View>
+            </View> */}
 
             <View style={[styles.headingContainer, { marginTop: verticalScale(30) }]}>
                 <Text style={styles.headingStyle}>{"Delivery"}</Text>

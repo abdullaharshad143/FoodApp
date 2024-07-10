@@ -24,6 +24,7 @@ const CartScreen = ({
     const cartItems = useSelector((state: RootState) => state.produce.items);
     const status = useSelector((state: any) => state.user.status);
     const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
+    const paymentSuccess = useSelector((state: any) => state.payment.paymentSuccess);
     const priceWithDelivery = totalPrice ? totalPrice + 150 : 150;
     const oneTimePrice = priceWithDelivery + 200;
     const dispatch = useDispatch();
@@ -35,37 +36,37 @@ const CartScreen = ({
     const handleUpdateOrder = useCallback(async () => {
         setLoading(true);
         const userId = await AsyncStorage.getItem('userId');
-        
+
         if (!userId) {
             console.error("User ID not found");
             setLoading(false);
             return;
         }
-        
+
         try {
             const userDocRef = doc(db, "users", userId);
             const userDoc = await getDoc(userDocRef);
-            
+
             if (!userDoc.exists()) {
                 console.error("User document not found");
                 setLoading(false);
                 return;
             }
-            
+
             const orderId = userDoc.data().orderId;
-            
+
             if (!orderId) {
                 console.error("Order ID not found");
                 setLoading(false);
                 return;
             }
-    
+
             const orderData = {
                 orderedItems: cartItems,
                 totalPrice: status === "ACTIVE" ? priceWithDelivery : oneTimePrice,
                 orderUpdateDate: new Date().toISOString(),
             };
-    
+
             const collectionName = status === "ACTIVE" ? "subscription" : "oneTime";
             const orderDocRef = doc(db, collectionName, orderId);
             await updateDoc(orderDocRef, orderData);
@@ -83,21 +84,25 @@ const CartScreen = ({
                 <ScrollView style={styles.mainContainer}>
                     <Header text="Cart" top={40} />
                     <View style={styles.cartItemsContainer}>
-                        <View style={{ alignItems: 'flex-end', marginHorizontal: 15 }}>
-                            <SmallButton title="Clear Cart" onPress={clearTheCart} />
-                        </View>
+                        {!paymentSuccess && (
+                            <View style={{ alignItems: 'flex-end', marginHorizontal: 15 }}>
+                                <SmallButton title="Clear Cart" onPress={clearTheCart} />
+                            </View>
+                        )}
                         <Cart />
                     </View>
                     <View style={styles.paymentDetailsContainer}>
                         <PaymentDetails />
                     </View>
-                    <View style={styles.buttonContiner}>
-                        {status === "ACTIVE" || "SCHEDULED" || "PAUSE" ? (
-                            <SmallButton title="Update" loading={loading} onPress={handleUpdateOrder} />
-                        ) : (
-                            <SmallButton title="Checkout" onPress={() => navigation.navigate("SubscribeAndSaveScreen")} />
-                        )}
-                    </View>
+                    {!paymentSuccess && (
+                        <View style={styles.buttonContiner}>
+                            {status === "ACTIVE" || "SCHEDULED" || "PAUSE" ? (
+                                <SmallButton title="Update" loading={loading} onPress={handleUpdateOrder} />
+                            ) : (
+                                <SmallButton title="Checkout" onPress={() => navigation.navigate("SubscribeAndSaveScreen")} />
+                            )}
+                        </View>
+                    )}
                 </ScrollView>
             ) : (
                 <View style={styles.noItemsStyle}>
