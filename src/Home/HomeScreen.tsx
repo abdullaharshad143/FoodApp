@@ -20,25 +20,29 @@ import { setUser } from "../redux/users/userSlices"
 import { useFocusEffect } from "@react-navigation/native"
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { setPaymentSuccess } from "../redux/orders/paymentSlices"
+import { checkAndUpdateOrderStatus } from "../utils/checkAndUpdateOrderStatus"
+import { setDeliveryDate } from "../redux/orders/deliveryDateSlice"
 
 const HomeScreen = ({
     navigation,
 }: NativeStackScreenProps<RootBottomParamList>) => {
     const [loading, setLoading] = useState(false)
     const paymentSuccess = useSelector((state: any) => state.payment.paymentSuccess);
-    console.log("paymentSuccess: ", paymentSuccess)
+    const data = useSelector((state: any) => state.user)
+    const status = data.status
     const dispatch = useDispatch();
     useEffect(() => {
         console.log("Inside Home Screen")
     }, [])
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         getUser();
-    //     }, [])
-    // );
+    useFocusEffect(
+        useCallback(() => {
+            getUser();
+        }, [])
+    );
     const getUser = async () => {
         setLoading(true)
         try {
+            await checkAndUpdateOrderStatus();
             const userId = await AsyncStorage.getItem('userId');
             if (!userId) {
                 throw new Error("User ID not found in AsyncStorage");
@@ -61,6 +65,7 @@ const HomeScreen = ({
                         if (subscriptionDoc.exists()) {
                             orderedItems = subscriptionDoc.data().orderedItems as IProduce[];
                             dispatch(setPaymentSuccess(subscriptionDoc.data().paymentSuccess))
+                            dispatch(setDeliveryDate(subscriptionDoc.data().nextPaymentDueDate));
                         }
                     } else if (status === "SCHEDULED") {
                         const oneTimeDocRef = doc(db, "oneTime", orderId);
@@ -69,6 +74,7 @@ const HomeScreen = ({
                         if (oneTimeDoc.exists()) {
                             orderedItems = oneTimeDoc.data().orderedItems as IProduce[];
                             dispatch(setPaymentSuccess(oneTimeDoc.data().paymentSuccess))
+                            dispatch(setDeliveryDate(oneTimeDoc.data().nextPaymentDueDate));
                         }
                     }
                 }
@@ -130,7 +136,7 @@ const HomeScreen = ({
         <>
             <SafeAreaView style={styles.mainContainer}>
                 <ScrollView style={styles.scrollView}>
-                    {!paymentSuccess &&
+                    {(!paymentSuccess && (status === "ACTIVE" || status === "SCHEDULED")) && (
                         <TouchableOpacity
                             style={styles.banner}
                             onPress={() => navigation.navigate('ScheduledScreen')}
@@ -139,7 +145,7 @@ const HomeScreen = ({
                                 Pending Payment: Complete your payment before Saturday to avoid cancellation of your order or subscription. Click here to pay now.
                             </Text>
                         </TouchableOpacity>
-                    }
+                    )}
                     <TouchableOpacity onPress={() => navigation.navigate("SearchScreen")} style={styles.searchContainer}>
                         <Icon style={{ marginHorizontal: 10 }} name="search" size={25} color={Colors.lightGrey} />
                         <Text style={styles.textStyle}>{"Search"}</Text>
@@ -147,7 +153,7 @@ const HomeScreen = ({
                     {renderCategory('Fruit')}
                     {renderCategory('Vegetable')}
                     {renderCategory('Dairy')}
-                    {renderCategory('Meat & Poultry')}
+                    {/* {renderCategory('Meat & Poultry')} */}
                     {renderCategory('Condiments')}
                     {renderCategory('Grains')}
                     {renderCategory('Beverages')}

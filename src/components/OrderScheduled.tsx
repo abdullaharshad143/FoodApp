@@ -5,7 +5,6 @@ import Fonts from "../theme/typographic";
 import { Colors } from "../theme/color";
 import Button from "./Button";
 import { FontAwesome as Icon } from "@expo/vector-icons";
-import { formatDate, getNextDayOfWeek } from "../utils/date";
 import { initPaymentSheet, presentPaymentSheet } from "@stripe/stripe-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -13,6 +12,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { db } from "../../config/firebase";
 import { setPaymentSuccess } from "../redux/orders/paymentSlices";
+import { formatDate } from "../utils/formatDate";
 
 
 interface OrderScheduledProps {
@@ -22,10 +22,6 @@ interface OrderScheduledProps {
 const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
     useEffect(() => {
     }, [])
-    const saturdaydate = getNextDayOfWeek(6)
-    const tuesdayDate = getNextDayOfWeek(2);
-    const saturdayFormattedDate = formatDate(saturdaydate)
-    const tuesdayFormattedDate = formatDate(tuesdayDate)
     const [loading, setLoading] = useState(false)
     const data = useSelector((state: any) => state.user)
     const status = data.status
@@ -38,6 +34,8 @@ const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
     // console.log("oneTimePrice: ",oneTimePrice)
     // console.log("priceWithDelivery: ",priceWithDelivery)
     // console.log("status: ",status)
+    const deliveryDate = useSelector((state: any) => state.delivery.deliveryDate);
+    const deliveryFormattedDate = formatDate(deliveryDate)
 
     const handlePaymentSuccess = async () => {
         try {
@@ -139,7 +137,7 @@ const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
                     <Icon style={styles.iconStyle} name="truck" size={25} color={"black"} />
                 </View>
                 <View>
-                    <Text style={styles.textStyle}>{`Delivery on ${tuesdayFormattedDate}`}</Text>
+                    <Text style={styles.textStyle}>{`Delivery on ${deliveryFormattedDate}`}</Text>
                     <Text style={styles.lightTextStyle}>{"Before 6:30pm"}</Text>
                 </View>
             </View>

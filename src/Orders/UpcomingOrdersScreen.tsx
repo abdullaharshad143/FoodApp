@@ -3,11 +3,12 @@ import { Text, View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } f
 import Fonts from "../theme/typographic";
 import { horizontalScale, moderateScale, verticalScale } from "../utils/responsive";
 import { FontAwesome as Icon } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Timestamp, doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { format, addDays, differenceInDays, nextTuesday, nextSaturday, isAfter } from "date-fns";
+import { formatDate } from "../utils/formatDate";
 
 interface OrderData {
     status: string;
@@ -22,6 +23,8 @@ const UpcomingOrders = () => {
     const [orderData, setOrderData] = useState<OrderData | null>(null);
     const [nextOrder, setNextOrder] = useState<any>(null);
     const [refreshing, setRefreshing] = useState(false);
+    const deliveryDate2 = useSelector((state:any) => state.delivery.deliveryDate);
+    const deliveryFormattedDate = new Date(deliveryDate2);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -71,28 +74,28 @@ const UpcomingOrders = () => {
             if (status === "SCHEDULED") {
                 let deliveryDate: string | undefined = "Date not available";
                 let daysUntilDelivery: number | string = "N/A";
-                let billingDate: string | undefined = "Date not available";
-                let daysUntilBilling: number | string = "N/A";
+                // let billingDate: string | undefined = "Date not available";
+                // let daysUntilBilling: number | string = "N/A";
             
                 const today = new Date();
                 let nextTuesdayDate = nextTuesday(today);
                 const nextSaturdayDate = nextSaturday(today);
             
-                if (isAfter(nextSaturdayDate, nextTuesdayDate)) {
-                    nextTuesdayDate = addDays(nextTuesdayDate, 7);
-                }
+                // if (isAfter(nextSaturdayDate, nextTuesdayDate)) {
+                //     nextTuesdayDate = addDays(nextTuesdayDate, 7);
+                // }
             
-                daysUntilBilling = differenceInDays(nextSaturdayDate, today);
-                daysUntilDelivery = differenceInDays(nextTuesdayDate, today);
+                // daysUntilBilling = differenceInDays(nextSaturdayDate, today);
+                daysUntilDelivery = differenceInDays(deliveryFormattedDate, today);
             
-                billingDate = format(nextSaturdayDate, 'PPPP');
-                deliveryDate = format(nextTuesdayDate, 'PPPP');
+                // billingDate = format(nextSaturdayDate, 'PPPP');
+                deliveryDate = format(deliveryFormattedDate, 'PPPP');
             
                 setNextOrder({
                     deliveryDate,
                     daysUntilDelivery,
-                    billingDate,
-                    daysUntilBilling,
+                    // billingDate,
+                    // daysUntilBilling,
                 });
             }            
              else {
@@ -113,21 +116,21 @@ const UpcomingOrders = () => {
         const today = new Date();
 
         for (let i = 0; i < 10; i++) {
-            let deliveryDate = addDays(nextTuesday(today), i * (frequency * 7));
-            let billingDate = addDays(nextSaturday(today), i * (frequency * 7));
+            let deliveryDate = addDays(deliveryFormattedDate, i * (frequency * 7));
+            // let billingDate = addDays(nextSaturday(today), i * (frequency * 7));
             
-            if (isAfter(billingDate, deliveryDate)) {
-                deliveryDate = addDays(deliveryDate, 7);
-            }
+            // if (isAfter(billingDate, deliveryDate)) {
+            //     deliveryDate = addDays(deliveryDate, 7);
+            // }
 
             const daysUntilDelivery = differenceInDays(deliveryDate, today);
-            const daysUntilBilling = differenceInDays(billingDate, today);
+            // const daysUntilBilling = differenceInDays(billingDate, today);
 
             nextOrders.push({
                 deliveryDate: format(deliveryDate, 'PPPP'),
                 daysUntilDelivery,
-                billingDate: format(billingDate, 'PPPP'),
-                daysUntilBilling,
+                // billingDate: format(billingDate, 'PPPP'),
+                // daysUntilBilling,
             });
         }
 
@@ -144,7 +147,7 @@ const UpcomingOrders = () => {
                 <Icon name="calendar" size={24} color={orderData?.status === "PAUSE" ? '#ccc' : '#000000'} />
             </View>
             <View style={styles.orderDetails}>
-                        <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Billing: {item.billingDate} (in {item.daysUntilBilling} days)</Text>
+                        {/* <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Billing: {item.billingDate} (in {item.daysUntilBilling} days)</Text> */}
                         <Text style={[styles.orderText, orderData?.status === "PAUSE" ? styles.disabledText : null]}>Delivery: {item.deliveryDate} (in {item.daysUntilDelivery} days)</Text>
             </View>
         </View>
