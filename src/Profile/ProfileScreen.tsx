@@ -245,7 +245,7 @@ const ProfileScreen = ({
                     <Icon name="truck" size={25} color={"black"} />
                 </View>
                 <View>
-                    <Text style={styles.infoStyle}>{"Available on Tuesdays"}</Text>
+                    <Text style={styles.infoStyle}>{"Available on Saturdays"}</Text>
                 </View>
 
             </View>

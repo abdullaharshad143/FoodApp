@@ -54,7 +54,7 @@ const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBotto
             status: selectOneTime ? 'SCHEDULED' : 'ACTIVE',
             frequency: selectOneTime ? null : frequency,
             orderDate: new Date().toISOString(),
-            nextPaymentDate: format(nextSaturday(new Date()), 'yyyy-MM-dd')
+            nextPaymentDueDate: format(nextSaturday(new Date()), 'yyyy-MM-dd')
         };
 
         try {
