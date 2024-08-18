@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { arrayUnion, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { addWeeks, format, nextSaturday } from "date-fns";
+import sendEmail from "./sendEmail";
 
 export const checkAndUpdateOrderStatus = async () => {
     try {
@@ -18,10 +19,10 @@ export const checkAndUpdateOrderStatus = async () => {
 
         const userData = userDocSnapshot.data();
         const status = userData.status;
-        if(status != "ACTIVE" && status != "SCHEDULED"){
+        if (status !== "ACTIVE" && status !== "SCHEDULED") {
             return;
         }
-        const collectionName = status === "ACTIVE" ? "subscription" : "OneTime"
+        const collectionName = status === "ACTIVE" ? "subscription" : "oneTime";
         const orderId = userData.orderId;
         if (!orderId) {
             throw new Error('Order ID not found in user document');
@@ -38,21 +39,31 @@ export const checkAndUpdateOrderStatus = async () => {
         const { nextPaymentDueDate, paymentSuccess, frequency } = orderData;
         const dueDate = new Date(nextPaymentDueDate);
         const currentDate = new Date();
-        if (currentDate < dueDate){
+        if (currentDate < dueDate) {
             return;
         }
         if (currentDate > dueDate) {
             if (!paymentSuccess) {
                 await updateDoc(orderDocRef, { status: 'CANCELLED' });
                 await updateDoc(userDocRef, { status: 'CANCELLED' });
-                alert("Your order has been cancelled due to non-payment!")
+                alert("Your order has been cancelled due to non-payment!");
             } else {
                 await updateDoc(orderDocRef, { status: 'COMPLETE' });
                 await updateDoc(userDocRef, {
                     pastOrders: arrayUnion(orderId)
                 });
 
-                if (orderData.status === 'ACTIVE') {
+                const userEmail = userData.email; // Ensure user's email is stored in userData
+                const subject = status === "ACTIVE"
+                    ? 'Your Subscription Order Update'
+                    : 'Your One-Time Order Update';
+                const text = status === "ACTIVE"
+                    ? `Your previous order is confirmed and will be delivered today. Your next order has been generated with a total price of ${orderData.totalPrice}. The next delivery is scheduled for ${format(nextSaturday(currentDate), 'yyyy-MM-dd')}. You can edit the order before making a payment.`
+                    : `Your one-time order is confirmed and will be delivered today. The total price is ${orderData.totalPrice}.`;
+
+                await sendEmail(userEmail, subject, text);
+
+                if (status === "ACTIVE") {
                     let newDueDate;
                     switch (frequency) {
                         case 1:
@@ -84,7 +95,13 @@ export const checkAndUpdateOrderStatus = async () => {
                         orderId: newOrderRef.id,
                         status: 'ACTIVE'
                     });
-                    alert("Your previous order is confirmed and will be delivered Today. In the meanwhile, your next order has been generated. ")
+
+                    alert("Your previous order is confirmed and will be delivered today. In the meantime, your next order has been generated.");
+                } else if (status === "SCHEDULED") {
+                    await updateDoc(userDocRef, {
+                        status: ''
+                    });
+                    alert("Your one-time order is confirmed and will be delivered today.");
                 }
             }
         }

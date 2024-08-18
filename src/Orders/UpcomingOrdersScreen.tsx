@@ -52,6 +52,10 @@ const UpcomingOrders = () => {
             }
 
             const { status, orderId } = userData;
+            if (status !== "ACTIVE" && status !== "SCHEDULED" && status !== "PAUSE") {
+                setOrderData(null);
+                return;
+            }
 
             let collectionName: string;
             if (status === "ACTIVE" || "PAUSE") {

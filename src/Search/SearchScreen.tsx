@@ -1,31 +1,57 @@
-import React, { useState } from "react";
-import { View, StyleSheet, FlatList, Text, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, FlatList, Text, ScrollView, ActivityIndicator } from "react-native";
 import Header from "../components/Header";
 import SearchComponent from "../components/SearchComponent";
 import FoodCard from "../components/FoodCard";
-import { foodData } from "../Home/data";
+// import { foodData } from "../Home/data";
 import { verticalScale } from "../utils/responsive";
 import Fonts from "../theme/typographic";
 import FloatingButton from "../components/FloatingButton";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootBottomParamList } from "../core/types";
+import { IProduce, RootBottomParamList } from "../core/types";
+import { fetchFoodItems } from "../utils/getProduceItems";
+import { Colors } from "../theme/color";
 
 const SearchScreen = ({
     navigation,
 }: NativeStackScreenProps<RootBottomParamList>) => {
     const [query, setQuery] = useState<string>("");
-
+    const [foodItems, setFoodItems] = useState<IProduce[]>([]);
+    const [loading, setLoading] = useState(false)
     const handleSearch = (text: string) => {
         setQuery(text);
     };
 
+    useEffect(() => {
+        const loadFoodItems = async () => {
+            setLoading(true)
+            try {
+                const items = await fetchFoodItems();
+                setFoodItems(items);
+            } catch (error) {
+                console.error("Error loading food items:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadFoodItems();
+    }, []);
+
     const filteredData = query
-        ? foodData.filter(item =>
+        ? foodItems.filter(item =>
             item.name.toLowerCase().includes(query.toLowerCase()) ||
             item.id.toString().includes(query) ||
             item.category.toLowerCase().includes(query.toLowerCase())
         )
         : [];
+    if(loading){
+        return(
+            <View style={{justifyContent:'center', flex:1}}>
+                <ActivityIndicator size={'large'} color={Colors.lightOrange}></ActivityIndicator>
+            </View>
+        )
+    }
 
     return (
         <View style={{ backgroundColor: 'white', flex: 1 }}>
@@ -47,7 +73,12 @@ const SearchScreen = ({
                         }}
                     />
                 )}
-                {filteredData.length == 0 && (
+                {!query && (
+                    <View style={styles.textContainer}>
+                    <Text style={styles.textStyle}>{"Please type to search something!"}</Text>
+                </View>
+                )}
+                {filteredData.length == 0 && query && (
                     <View style={styles.textContainer}>
                         <Text style={styles.textStyle}>{"No product found!"}</Text>
                     </View>

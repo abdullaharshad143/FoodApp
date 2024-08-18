@@ -17,6 +17,7 @@ import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { deleteUser, getAuth } from "firebase/auth";
 import { clearCart } from "../redux/cart/cartSlices";
+import { setPaymentSuccess } from "../redux/orders/paymentSlices";
 const ProfileScreen = ({
     navigation
 }: NativeStackScreenProps<RootStackParamList>) => {
@@ -45,6 +46,9 @@ const ProfileScreen = ({
                 break;
             case "PAUSE":
                 msg = "Are you sure you want to Pause the subscription?";
+                break;
+            case "CANCELLED":
+                msg = "Are you sure you want to Cancel the order?";
                 break;
             default:
                 msg = "Are you sure you want to Cancel the subscription?";
@@ -88,18 +92,33 @@ const ProfileScreen = ({
 
                             const subscriptionDocRef = doc(db, "subscription", orderId);
                             const subscriptionDoc = await getDoc(subscriptionDocRef);
+                            const oneTimeDocRef = doc(db, "oneTime", orderId);
+                            const oneTimeDoc = await getDoc(oneTimeDocRef); 
 
                             if (subscriptionDoc.exists()) {
                                 await updateDoc(subscriptionDocRef, {
+                                    status: status == "PAUSE" ? "PAUSE" : "ACTIVE" ? "ACTIVE" : "CANCELLED",
+                                });
+                                await updateDoc(userDocRef, {
+                                    status: status  == "PAUSE" ? "PAUSE" : "ACTIVE" ? "ACTIVE" : "CANCELLED"
+                                });
+                                dispatch(setUser({ status: status == "PAUSE" ? "PAUSE" : "ACTIVE" ? "ACTIVE" : "CANCELLED" }));
+                                setLoading(false)
+                                alert(`Subscription ${status}D!`);
+                                if (status == "CANCELLED"){dispatch(setPaymentSuccess(null));}
+                                console.log(`Subscription status updated to ${status}`);
+                            } else if (oneTimeDoc.exists()){
+                                await updateDoc(oneTimeDocRef, {
                                     status: status,
                                 });
                                 dispatch(setUser({ status: status }));
                                 setLoading(false)
-                                alert("Subscription Updated!");
-                                console.log(`Subscription status updated to ${status}`);
+                                alert("Order Cancelled!");
+                                dispatch(setPaymentSuccess(null));
                             }
                         } else {
                             console.error("User document not found");
+                            setLoading(false)
                         }
                     }
                 }
@@ -265,7 +284,7 @@ const ProfileScreen = ({
                         <SmallButton title="Cancel Order" onPress={() => updateSubscriptionStatus("CANCELLED")} />
                     )}
                     {status === "ACTIVE" && (
-                        <SmallButton title="Cancel Subscription" onPress={() => updateSubscriptionStatus("CANCELLED")} />
+                        <SmallButton title="Cancel Subscription" onPress={() => updateSubscriptionStatus("CANCEL")} />
                     )}
                     <SmallButton title="Logout" loading={loading} onPress={logout()} />
                     <SmallButton title="Delete Account" onPress={deleteAccount} />

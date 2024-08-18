@@ -1,5 +1,3 @@
-import { ImageProps } from "react-native"
-
 export type RootStackParamList = {
     SignupScreen: undefined
     Auth: undefined
@@ -49,7 +47,7 @@ export interface IProduce {
     items?: any
     id: string
     name: string
-    image: ImageProps
+    image: string
     // type: string
     marketPrice: string
     subText: string
@@ -58,4 +56,13 @@ export interface IProduce {
     weight: string
     quantity?: number
     totalPrice?: number
+} 
+
+export interface CompleteOrder {
+    id: string;
+    status: string;
+    nextPaymentDueDate: string;
+    totalPrice: number;
+    cartItems: IProduce[];
+    [key: string]: any; 
 }

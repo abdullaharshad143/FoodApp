@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { horizontalScale, moderateScale, verticalScale } from '../utils/responsive';
 import { Colors } from '../theme/color';
 import Fonts from '../theme/typographic';
@@ -65,7 +65,13 @@ const FoodCard: React.FC<{ item: IProduce }> = ({ item }) => {
                     )}
                 </View>
             )}
-            <Image source={item.image} style={styles.foodImage} />
+            {item.image? (
+                <Image source={{uri: item.image}} style={styles.foodImage} />
+            ): (
+                <View style={{flex:1, justifyContent:'center'}}>
+                    <ActivityIndicator size={"large"} color={Colors.lightOrange}></ActivityIndicator>
+                    </View>
+            )}
             <View style={styles.foodDetails}>
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.foodPrice}>Rs {item.price}</Text>
@@ -74,7 +80,6 @@ const FoodCard: React.FC<{ item: IProduce }> = ({ item }) => {
                 <Text style={styles.foodName}>{item.name}</Text>
                 <Text style={styles.foodSubText}>{item.subText}</Text>
                 <Text style={styles.foodSubText}>{item.weight}</Text>
-                {/* Add more details if needed */}
             </View>
         </View>
     );
