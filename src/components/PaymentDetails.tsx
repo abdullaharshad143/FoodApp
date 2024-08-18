@@ -8,14 +8,17 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 // import { formatDate, getNextDayOfWeek } from "../utils/date";
 import { formatDate } from "../utils/formatDate";
+import { getNextSaturday } from "../utils/date";
+
 
 const PaymentDetails = () => {
-    const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
+    const totalPrice = useSelector((state: RootState) => state.pr oduce.totalPrice);
     // const saturdaydate = getNextDayOfWeek(6)
     // const tuesdayDate = getNextDayOfWeek(2);
     // const saturdayFormattedDate = formatDate(saturdaydate)
     const deliveryDate = useSelector((state:any) => state.delivery.deliveryDate);
     const deliveryFormattedDate = formatDate(deliveryDate)
+    const nextSaturday = getNextSaturday();
     // const tuesdayFormattedDate = formatDate(tuesdayDate)
     const paymentSuccess = useSelector((state: any) => state.payment.paymentSuccess);
     let priceWithDelivery = 150
@@ -43,7 +46,7 @@ const PaymentDetails = () => {
                     </View>
                     <View>
                         {!paymentSuccess ? (
-                            <Text style={[styles.textStyle, styles.margin]}>{`You can bill any time before ${deliveryFormattedDate}`}</Text>
+                            <Text style={[styles.textStyle, styles.margin]}>{`You can bill any time before ${nextSaturday}`}</Text>
                             /* <Text style={[styles.lightTextStyle, styles.margin]}>{'At cut-off 11:59 pm'}</Text> */
                         ) : (
                             <Text style={[styles.textStyle, styles.margin, {marginTop:7}]}>{`Billing is done!`}</Text>
@@ -56,7 +59,7 @@ const PaymentDetails = () => {
                         <Icon name="truck" size={30} color={'black'} style={styles.iconStyle} />
                     </View>
                     <View>
-                        <Text style={[styles.textStyle, styles.margin]}>{`Delivery on ${deliveryFormattedDate}`}</Text>
+                        <Text style={[styles.textStyle, styles.margin]}>{`Delivery on ${nextSaturday}`}</Text>
                         <Text style={[styles.lightTextStyle, styles.margin]}>{'Before 6:30 pm'}</Text>
                     </View>
                 </View>

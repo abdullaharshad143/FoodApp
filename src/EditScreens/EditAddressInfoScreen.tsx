@@ -184,6 +184,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         justifyContent: 'space-around',
+        backgroundColor:'white'
     },
     contentContainer: {
         alignItems: 'center',

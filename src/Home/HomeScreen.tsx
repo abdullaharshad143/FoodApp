@@ -10,7 +10,7 @@ import FloatingButton from "../components/FloatingButton"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React from "react"
 import OrderScheduled from "../components/OrderScheduled"
-import { foodData } from "./data"
+// import { foodData } from "./data"
 import { collection, doc, getDoc, getDocs } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { db } from "../../config/firebase"
@@ -22,11 +22,13 @@ import { FontAwesome as Icon } from "@expo/vector-icons";
 import { setPaymentSuccess } from "../redux/orders/paymentSlices"
 import { checkAndUpdateOrderStatus } from "../utils/checkAndUpdateOrderStatus"
 import { setDeliveryDate } from "../redux/orders/deliveryDateSlice"
+import { fetchFoodItems } from "../utils/getProduceItems"
 
 const HomeScreen = ({
     navigation,
 }: NativeStackScreenProps<RootBottomParamList>) => {
     const [loading, setLoading] = useState(false)
+    const [foodItems, setFoodItems] = useState<IProduce[]>([]);
     const paymentSuccess = useSelector((state: any) => state.payment.paymentSuccess);
     const data = useSelector((state: any) => state.user)
     const status = data.status
@@ -39,6 +41,20 @@ const HomeScreen = ({
             getUser();
         }, [])
     );
+    useEffect(() => {
+        const loadFoodItems = async () => {
+            try {
+                const items = await fetchFoodItems();
+                setFoodItems(items);
+            } catch (error) {
+                console.error("Error loading food items:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadFoodItems();
+    }, []);
     const getUser = async () => {
         setLoading(true)
         try {
@@ -66,6 +82,8 @@ const HomeScreen = ({
                             orderedItems = subscriptionDoc.data().orderedItems as IProduce[];
                             dispatch(setPaymentSuccess(subscriptionDoc.data().paymentSuccess))
                             dispatch(setDeliveryDate(subscriptionDoc.data().nextPaymentDueDate));
+                              //@ts-ignore
+                             dispatch(setItems(orderedItems));
                         }
                     } else if (status === "SCHEDULED") {
                         const oneTimeDocRef = doc(db, "oneTime", orderId);
@@ -75,13 +93,13 @@ const HomeScreen = ({
                             orderedItems = oneTimeDoc.data().orderedItems as IProduce[];
                             dispatch(setPaymentSuccess(oneTimeDoc.data().paymentSuccess))
                             dispatch(setDeliveryDate(oneTimeDoc.data().nextPaymentDueDate));
+                              //@ts-ignore
+                             dispatch(setItems(orderedItems));
                         }
                     }
                 }
 
                 dispatch(setUser({ status }));
-                //@ts-ignore
-                dispatch(setItems(orderedItems));
             } else {
                 dispatch(setUser({ status: "" }));
             }
@@ -93,16 +111,6 @@ const HomeScreen = ({
         }
     };
 
-    // const foodData: IProduce[] = [
-    //     { id: '1', name: 'Apple', price: 199, marketPrice: '2.49', subText: 'Fresh and juicy', category: 'Fruit', weight: '1kg', image: require('../assets/apples.jpg') },
-    //     { id: '2', name: 'Banana', price: 99, marketPrice: '1.29', subText: 'Rich in potassium', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
-    //     { id: '3', name: 'Carrot', price: 79, marketPrice: '0.99', subText: 'High in Vitamin A', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
-    //     { id: '4', name: 'Orange', price: 149, marketPrice: '1.99', subText: 'Source of Vitamin C', category: 'Fruit', weight: '1dozen', image: require('../assets/apples.jpg') },
-    //     { id: '5', name: 'Broccoli', price: 129, marketPrice: '1.79', subText: 'Nutrient-rich', category: 'Vegetable', weight: '1kg', image: require('../assets/apples.jpg') },
-    //     // Add more food items as needed
-    // ];
-
-    // Function to render individual food item
     const renderItem: ListRenderItem<IProduce> = ({ item }) => (
         <FoodCard item={item} />
     );
@@ -111,6 +119,14 @@ const HomeScreen = ({
         return (
             <View style={styles.loaderStyle}>
                 <ActivityIndicator size={"large"} color={Colors.lightOrange} />
+            </View>
+        )
+    }
+
+    if(foodItems.length == 0){
+        return(
+            <View style={{flex:1, justifyContent:'center', backgroundColor:'white', alignItems:'center'}}>
+                <Text style={styles.bannerText} >No Products to show!</Text>
             </View>
         )
     }
@@ -124,7 +140,7 @@ const HomeScreen = ({
             </View>
             <FlatList
                 horizontal
-                data={foodData.filter(food => food.category === category)}
+                data={foodItems.filter(food => food.category === category)}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 style={{ marginHorizontal: 10 }}
@@ -153,7 +169,7 @@ const HomeScreen = ({
                     {renderCategory('Fruit')}
                     {renderCategory('Vegetable')}
                     {renderCategory('Dairy')}
-                    {/* {renderCategory('Meat & Poultry')} */}
+                    {renderCategory('Meat & Poultry')}
                     {renderCategory('Condiments')}
                     {renderCategory('Grains')}
                     {renderCategory('Beverages')}

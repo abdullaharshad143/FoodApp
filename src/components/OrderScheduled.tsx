@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { db } from "../../config/firebase";
 import { setPaymentSuccess } from "../redux/orders/paymentSlices";
 import { formatDate } from "../utils/formatDate";
+import { getNextSaturday } from "../utils/date";
 
 
 interface OrderScheduledProps {
@@ -36,6 +37,7 @@ const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
     // console.log("status: ",status)
     const deliveryDate = useSelector((state: any) => state.delivery.deliveryDate);
     const deliveryFormattedDate = formatDate(deliveryDate)
+    const nextSaturday = getNextSaturday();
 
     const handlePaymentSuccess = async () => {
         try {
@@ -137,7 +139,7 @@ const OrderScheduled: React.FC<OrderScheduledProps> = ({ onPress }) => {
                     <Icon style={styles.iconStyle} name="truck" size={25} color={"black"} />
                 </View>
                 <View>
-                    <Text style={styles.textStyle}>{`Delivery on ${deliveryFormattedDate}`}</Text>
+                    <Text style={styles.textStyle}>{`Delivery on ${nextSaturday}`}</Text>
                     <Text style={styles.lightTextStyle}>{"Before 6:30pm"}</Text>
                 </View>
             </View>

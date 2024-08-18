@@ -1,22 +1,52 @@
-import React, { useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../core/types";
-import { View, Text, TextInput, SafeAreaView, StyleSheet } from "react-native";
+import { View, Text, TextInput, SafeAreaView, StyleSheet, Alert } from "react-native";
 import { Colors } from "../../theme/color";
 import Header from "../../components/Header";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/responsive";
 import Button from "../../components/Button";
 import Fonts from "../../theme/typographic";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 
 const ForgotPasswordScreen = ({
     navigation,
 }: NativeStackScreenProps<RootStackParamList>) => {
-    const handlePress = useCallback(() => {
-    }, [])
+    const [email, setEmail] = useState<string>('');
+    const [loading, setLoading] = useState(false)
+
+    const handlePress = useCallback(async () => {
+        setLoading(true)
+
+        try {
+            if (email.trim() === '') {
+                Alert.alert('Error', 'Please enter your email address.');
+                return;
+            }
+
+            const auth = getAuth();
+            await sendPasswordResetEmail(auth, email);
+            Alert.alert('Success', 'Password reset email sent! Please check your inbox.');
+            navigation.goBack();
+        } catch (error: any) {
+            if (error.code === 'auth/user-not-found') {
+                Alert.alert('Error', 'No account found with this email address.');
+            }
+            else if (error.code === 'auth/invalid-email') {
+                Alert.alert("PLease enter valid email!")
+            } else {
+                Alert.alert('Error', 'Failed to send password reset email. Please try again.');
+            }
+            console.error("Error sending password reset email:", error);
+        } finally {
+            setLoading(false)
+        }
+    }, [email, navigation]);
+
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View >
+            <View>
                 <Header top={10} />
             </View>
             <View style={styles.contentContainer}>
@@ -25,21 +55,23 @@ const ForgotPasswordScreen = ({
                     <TextInput
                         style={styles.inputStyle}
                         placeholder="Email"
-                    >
-                    </TextInput>
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
                 </View>
-                <Button title="Send Email" onPress={handlePress}>
-                </Button>
+                <Button loading={loading} title="Send Email" onPress={handlePress} />
             </View>
         </SafeAreaView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         justifyContent: 'center',
-        color: Colors.authBackground
+        backgroundColor: Colors.authBackground
     },
     contentContainer: {
         alignItems: 'center',
@@ -69,4 +101,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ForgotPasswordScreen
+export default ForgotPasswordScreen;

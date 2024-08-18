@@ -37,7 +37,7 @@ const Cart = () => {
             <View style={styles.container}>
                 <View style={styles.cardContainer}>
                     <View style={styles.cardImage}>
-                        <Image source={item.image} style={styles.cardImage} />
+                        <Image source={{uri:item.image}} style={styles.cardImage} />
                     </View>
                     <Text style={styles.textOrdername}>{item.name}</Text>
                     <View style={styles.textmainView}>

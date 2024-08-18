@@ -15,6 +15,7 @@ import { db } from "../../config/firebase";
 import { setUser } from "../redux/users/userSlices";
 import { RootState } from "../redux/store";
 import { format, nextSaturday } from "date-fns";
+import sendEmail from "../utils/sendEmail";
 
 const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBottomParamList>) => {
     const [selectSubscription, setSelectSubscription] = useState(true);
@@ -24,6 +25,7 @@ const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBotto
     const dispatch = useDispatch();
     const totalPrice = useSelector((state: RootState) => state.produce.totalPrice);
     const cartItems = useSelector((state: RootState) => state.produce.items);
+    const userData = useSelector((state: any) => state.user)
 
     const priceWithDelivery = totalPrice ? totalPrice + 150 : 150;
     const oneTimePrice = priceWithDelivery + 200;
@@ -68,6 +70,12 @@ const SubscribeAndSaveScreen = ({ navigation }: NativeStackScreenProps<RootBotto
                 orderType: selectOneTime ? 'One Time' : 'Subscription',
             });
             dispatch(setUser({ status: selectOneTime ? 'SCHEDULED' : 'ACTIVE' }));
+            const subject = selectOneTime ? 'Your One-Time Order Confirmation' : 'Your Subscription Order Confirmation';
+            const text = selectOneTime
+                ? `Thank you for your one-time order! The total price is Rs ${oneTimePrice}. Your delivery is scheduled for ${orderData.nextPaymentDueDate}.`
+                : `Thank you for your subscription order! The total price is Rs ${priceWithDelivery}. Your first delivery is scheduled for ${orderData.nextPaymentDueDate}.`;
+            
+            await sendEmail(userData.email, subject, text);
             navigation.navigate("ScheduledScreen");
         } catch (error) {
             console.error("Error adding document: ", error);

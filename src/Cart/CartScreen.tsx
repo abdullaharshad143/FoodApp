@@ -29,7 +29,6 @@ const CartScreen = ({
     const oneTimePrice = priceWithDelivery + 200;
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false)
-    console.log(cartItems)
     const clearTheCart = () => {
         dispatch(clearCart());
     }
@@ -95,9 +94,9 @@ const CartScreen = ({
                     <View style={styles.paymentDetailsContainer}>
                         <PaymentDetails />
                     </View>
-                    {!paymentSuccess && (
+                    {!paymentSuccess  && (
                         <View style={styles.buttonContiner}>
-                            {status === "ACTIVE" || status === "SCHEDULED" || status === "PAUSE" ? (
+                            {status === "ACTIVE" || status === "SCHEDULED" ? (
                                 <SmallButton title="Update" loading={loading} onPress={handleUpdateOrder} />
                             ) : (
                                 <SmallButton title="Checkout" onPress={() => navigation.navigate("SubscribeAndSaveScreen")} />

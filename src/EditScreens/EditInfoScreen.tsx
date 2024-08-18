@@ -83,7 +83,7 @@ const EditInfoScreen = ({
                     </TextInput>
                 </View>
                 <Text style={styles.textStyle}>{"To change email, please contact the FoodApp Team"}</Text>
-                <Button title="Change My Password" />
+                {/* <Button title="Change My Password" /> */}
                 <Button title="Save Changes" onPress={updateUser} loading={loading} />
             </View>
         </SafeAreaView>
